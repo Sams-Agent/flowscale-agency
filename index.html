@@ -1,927 +1,1434 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Flowscale — AI Automation Studio</title>
-
-<!-- Fonts: Syne (display) + Instrument Serif (editorial) + JetBrains Mono (code) -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-
 <style>
-/* ─── RESET & BASE ───────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
-body{
-  font-family:'Syne',sans-serif;
-  background:#0C0B09;
-  color:#F0EAD9;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .35s,color .35s}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:#0C0B09}
-::-webkit-scrollbar-thumb{background:#2E2C27;border-radius:99px}
 
-/* ─── CSS VARS ───────────────────────────────────── */
-:root{
-  --ink:    #0C0B09;
-  --paper:  #F0EAD9;
-  --dim:    #8C8473;
-  --faint:  #1E1D19;
-  --border: #2A2920;
-  --accent: #E8500A;     /* electric orange – distinctive, not cyan */
-  --green:  #3DDB7A;     /* result / success */
-  --blue:   #4F8EF7;     /* info / secondary */
-  --mono:   'JetBrains Mono', monospace;
-  --serif:  'Instrument Serif', Georgia, serif;
-  --sans:   'Syne', sans-serif;
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px}
+
+/* LIGHT THEME */
+:root,[data-theme="light"]{
+  --bg:#FFFFFF;
+  --bg-surface:#FAFAFA;
+  --bg-raised:#F4F4F2;
+  --text:#111110;
+  --text-sub:#52504C;
+  --text-dim:#97948D;
+  --border:rgba(17,17,16,.08);
+  --border-mid:rgba(17,17,16,.14);
+  --accent:#D94508;
+  --accent-dim:rgba(217,69,8,.07);
+  --accent-bd:rgba(217,69,8,.2);
+  --green:#1A8C4E;
+  --green-dim:rgba(26,140,78,.07);
+  --green-bd:rgba(26,140,78,.2);
+  --sky:#2563C4;
+  --nav-bg:rgba(255,255,255,.94);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Syne',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
 }
 
-/* ─── TYPOGRAPHY ─────────────────────────────────── */
-h1,h2,h3,h4{font-family:var(--sans);font-weight:800;line-height:1.05;letter-spacing:-.03em}
-.serif{font-family:var(--serif);font-style:italic;font-weight:400}
-.mono{font-family:var(--mono);font-size:.75em;letter-spacing:.04em}
-.label{
+/* DARK THEME */
+[data-theme="dark"]{
+  --bg:#0C0B09;
+  --bg-surface:#131210;
+  --bg-raised:#1A1916;
+  --text:#EAE5D5;
+  --text-sub:#8A8374;
+  --text-dim:#5C5749;
+  --border:rgba(234,229,213,.09);
+  --border-mid:rgba(234,229,213,.16);
+  --accent:#E8500A;
+  --accent-dim:rgba(232,80,10,.12);
+  --accent-bd:rgba(232,80,10,.28);
+  --green:#2ED67A;
+  --green-dim:rgba(46,214,122,.07);
+  --green-bd:rgba(46,214,122,.24);
+  --sky:#5B9CF6;
+  --nav-bg:rgba(12,11,9,.94);
+}
+
+body{background:var(--bg);color:var(--text)}
+
+/* TYPOGRAPHY */
+h1,h2,h3,h4{
+  font-family:var(--sans);font-weight:800;
+  line-height:1.04;letter-spacing:-.03em;
+  color:var(--text);
+}
+.t-label{
   font-family:var(--mono);
-  font-size:10px;
-  letter-spacing:.14em;
+  font-size:11px;
+  letter-spacing:.12em;
   text-transform:uppercase;
-  color:var(--dim);
+  color:var(--text-dim);
+  display:block;
 }
-.accent-text{color:var(--accent)}
-.green-text{color:var(--green)}
+.t-serif{font-family:var(--serif);font-style:italic;font-weight:400}
 
-/* ─── LAYOUT ─────────────────────────────────────── */
-.container{max-width:1180px;margin:0 auto;padding:0 32px}
-section{padding:100px 0}
+/* LAYOUT */
+.wrap{max-width:1160px;margin:0 auto;padding:0 40px}
+section{padding:108px 0}
 
-/* ─── NAV ────────────────────────────────────────── */
+/* NAV */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 40px;height:60px;
-  background:rgba(12,11,9,.85);
+  padding:0 40px;
+  background:var(--nav-bg);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
+  transition:background .35s,border-color .35s;
 }
-.nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo-mark{
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{
   width:30px;height:30px;border-radius:6px;
   background:var(--accent);
   display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
 }
-.nav-logo-name{font-weight:800;font-size:15px;letter-spacing:-.02em}
+.nav-name{font-size:15px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
 .nav-links{display:flex;gap:36px}
-.nav-links a{font-size:13px;font-weight:500;color:var(--dim);transition:color .2s}
-.nav-links a:hover{color:var(--paper)}
-.nav-right{display:flex;align-items:center;gap:10px}
-.lang-pill{
-  display:flex;background:var(--faint);border:1px solid var(--border);
-  border-radius:99px;overflow:hidden;
+.nav-links a{
+  font-size:13px;font-weight:500;
+  color:var(--text-dim);
+  transition:color .2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;bottom:-2px;left:0;right:0;
+  height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .22s var(--ease);
+}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-right{display:flex;align-items:center;gap:14px}
+
+/* Language toggle */
+.lang-switch{
+  display:flex;
+  background:var(--bg-raised);
+  border:1px solid var(--border-mid);
+  border-radius:4px;
+  overflow:hidden;
 }
 .lang-btn{
-  padding:5px 13px;font-size:12px;font-weight:600;
-  font-family:var(--mono);cursor:pointer;border:none;
-  background:transparent;color:var(--dim);
-  transition:all .2s;
+  padding:5px 13px;
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  border:none;background:transparent;
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:background .2s,color .2s;
 }
-.lang-btn.on{background:var(--accent);color:#fff}
-.lang-btn:not(.on):hover{color:var(--paper)}
+.lang-btn.active{background:var(--accent);color:#fff}
 
-/* ─── LANGUAGE TOGGLE ────────────────────────────── */
+/* Theme toggle */
+.theme-btn{
+  width:34px;height:34px;
+  border-radius:4px;
+  border:1px solid var(--border-mid);
+  background:var(--bg-raised);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:background .2s,border-color .2s;
+  color:var(--text-dim);
+  flex-shrink:0;
+}
+.theme-btn:hover{background:var(--bg);color:var(--text)}
+.icon-sun,.icon-moon{width:16px;height:16px}
+[data-theme="light"] .icon-moon{display:none}
+[data-theme="dark"] .icon-sun{display:none}
+
+/* LANG SYSTEM */
 body.lang-fr .en{display:none!important}
 body.lang-en .fr{display:none!important}
 
-/* ─── HERO ───────────────────────────────────────── */
+/* HERO */
 .hero{
-  min-height:100vh;
+  min-height:100svh;
   position:relative;
   display:flex;align-items:flex-end;
-  padding-bottom:80px;
+  padding-bottom:96px;
   overflow:hidden;
 }
 .hero-bg{
-  position:absolute;inset:0;
-  background-image:url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1920&q=60');
-  background-size:cover;background-position:center;
-  filter:brightness(.35) saturate(.6);
-  z-index:0;
-  transform:scale(1.02);
-  transition:transform 8s ease-out;
+  position:absolute;inset:0;z-index:0;
+  background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=75');
+  background-size:cover;
+  background-position:center 40%;
+  transform:scale(1.03);
+  transition:transform 9s var(--ease);
 }
-.hero-bg.loaded{transform:scale(1)}
-.hero-overlay{
-  position:absolute;inset:0;z-index:1;
+[data-theme="light"] .hero-bg{filter:brightness(.1) saturate(.3)}
+[data-theme="dark"] .hero-bg{filter:brightness(.22) saturate(.5)}
+.hero-bg.ready{transform:scale(1)}
+
+.hero-vignette{position:absolute;inset:0;z-index:1}
+[data-theme="light"] .hero-vignette{
   background:
-    linear-gradient(to top, rgba(12,11,9,1) 0%, rgba(12,11,9,.7) 40%, rgba(12,11,9,.2) 100%),
-    linear-gradient(to right, rgba(12,11,9,.6) 0%, transparent 60%);
+    linear-gradient(to top,rgba(255,255,255,1) 0%,rgba(255,255,255,.8) 35%,rgba(255,255,255,.05) 100%),
+    linear-gradient(to right,rgba(255,255,255,.85) 0%,rgba(255,255,255,.08) 60%);
 }
-.hero-content{
-  position:relative;z-index:2;
-  width:100%;
-  display:grid;grid-template-columns:1fr 1fr;
-  align-items:flex-end;
-  gap:60px;
+[data-theme="dark"] .hero-vignette{
+  background:
+    linear-gradient(to top,rgba(12,11,9,1) 0%,rgba(12,11,9,.72) 38%,rgba(12,11,9,.12) 100%),
+    linear-gradient(to right,rgba(12,11,9,.82) 0%,rgba(12,11,9,.1) 60%);
 }
-.hero-left{}
-.hero-tag{
+
+.hero-inner{
+  position:relative;z-index:2;width:100%;
+  display:grid;grid-template-columns:1fr 400px;
+  gap:80px;align-items:flex-end;
+}
+
+.hero-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
   padding:5px 12px;
-  border:1px solid rgba(232,80,10,.35);
-  border-radius:4px;
+  border:1px solid var(--accent-bd);
+  background:var(--accent-dim);
+  border-radius:3px;
   margin-bottom:28px;
 }
-.hero-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.hero-h1{font-size:clamp(42px,5.5vw,78px);line-height:1.02;margin-bottom:28px}
-.hero-h1 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--accent)}
-.hero-sub{font-size:16px;color:var(--dim);line-height:1.7;max-width:440px;margin-bottom:40px;font-weight:400}
-.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
-.btn-a{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:13px 24px;border-radius:6px;
-  background:var(--accent);color:#fff;
-  font-family:var(--sans);font-weight:700;font-size:13px;
-  border:none;cursor:pointer;
-  transition:background .2s,transform .15s;
+.eyebrow-pulse{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:blink 2.6s ease-in-out infinite;
+  flex-shrink:0;
 }
-.btn-a:hover{background:#cf4208;transform:translateY(-1px)}
-.btn-b{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:13px 24px;border-radius:6px;
-  background:transparent;color:var(--paper);
-  font-family:var(--sans);font-weight:600;font-size:13px;
-  border:1px solid var(--border);cursor:pointer;
-  transition:all .2s;
-}
-.btn-b:hover{border-color:#4A4840;background:var(--faint)}
-.hero-right{
-  display:flex;flex-direction:column;gap:2px;
-  align-self:flex-end;
-}
-.hero-stat-row{
-  display:flex;align-items:baseline;gap:14px;
-  padding:20px 0;
-  border-bottom:1px solid var(--border);
-}
-.hero-stat-row:last-child{border-bottom:none}
-.hero-stat-num{
-  font-size:48px;font-weight:800;line-height:1;
-  letter-spacing:-.05em;color:var(--paper);
-  font-variant-numeric:tabular-nums;
-}
-.hero-stat-label{font-size:13px;color:var(--dim);font-weight:400;line-height:1.4}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.eyebrow-text{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
 
-/* ─── MARQUEE ─────────────────────────────────────── */
-.marquee-wrap{
+.hero-h1{
+  font-size:clamp(46px,5.6vw,80px);
+  line-height:1.02;
+  margin-bottom:28px;
+  color:var(--text);
+}
+.hero-h1-accent{color:var(--accent)}
+.hero-h1-italic{font-family:var(--serif);font-style:italic;font-weight:400}
+
+.hero-body{
+  font-size:16px;
+  color:var(--text-sub);
+  line-height:1.7;
+  max-width:480px;
+  margin-bottom:40px;
+  font-weight:400;
+}
+
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:4px;
+  background:var(--accent);color:#fff;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  border:none;cursor:pointer;letter-spacing:-.01em;
+  transition:opacity .2s,transform .15s var(--ease);
+}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:4px;
+  background:transparent;
+  color:var(--text);
+  font-family:var(--sans);font-weight:600;font-size:14px;
+  border:1px solid var(--border-mid);cursor:pointer;letter-spacing:-.01em;
+  transition:background .2s,border-color .2s;
+}
+.btn-secondary:hover{background:var(--bg-raised)}
+
+/* Hero metrics panel */
+.hero-panel{
+  background:var(--bg-surface);
+  border:1px solid var(--border-mid);
+  border-radius:8px;
+  overflow:hidden;
+}
+.hm-row{
+  padding:24px 28px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:18px;
+}
+.hm-row:last-child{border-bottom:none}
+.hm-num{
+  font-size:42px;font-weight:800;
+  line-height:1;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+.hm-label{font-size:13px;color:var(--text-sub);font-weight:400;line-height:1.45}
+.hm-label strong{color:var(--text);font-weight:600;display:block;margin-bottom:2px}
+
+/* CLIENTS STRIP */
+.strip{
+  padding:22px 0;
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
-  padding:14px 0;
-  overflow:hidden;
-  background:var(--faint);
+  background:var(--bg-surface);
 }
-.marquee-track{
-  display:flex;width:max-content;
-  animation:scroll 28s linear infinite;
+.strip-inner{
+  display:flex;align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
 }
-@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.marquee-item{
-  display:flex;align-items:center;gap:10px;
-  padding:0 28px;
-  white-space:nowrap;
+.strip-label{
   font-family:var(--mono);font-size:11px;
-  color:var(--dim);letter-spacing:.08em;
-  text-transform:uppercase;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-dim);padding:0 28px;
 }
-.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.strip-div{width:1px;height:16px;background:var(--border-mid);flex-shrink:0}
+.strip-item{
+  padding:0 28px;
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-sub);
+  transition:color .2s;
+}
+.strip-item:hover{color:var(--text)}
 
-/* ─── SECTION HEADER ──────────────────────────────── */
-.sh{margin-bottom:60px}
-.sh .label{margin-bottom:14px}
-.sh-title{font-size:clamp(30px,4vw,52px);margin-bottom:16px}
-.sh-sub{font-size:15px;color:var(--dim);line-height:1.65;font-weight:400;max-width:480px}
+/* SECTION HEADERS */
+.sh{margin-bottom:64px}
+.sh .t-label{margin-bottom:14px}
+.sh-h2{font-size:clamp(32px,3.8vw,52px);line-height:1.04;margin-bottom:18px}
+.sh-sub{font-size:15px;color:var(--text-sub);line-height:1.7;font-weight:400;max-width:520px}
 
-/* ─── PORTFOLIO ───────────────────────────────────── */
-.cases{display:flex;flex-direction:column;gap:1px;background:var(--border)}
+/* PORTFOLIO */
+.portfolio-section{padding:100px 0 0}
 .case{
-  background:var(--ink);
-  padding:52px 0;
+  border-top:1px solid var(--border);
+  padding:68px 0;
   display:grid;
-  grid-template-columns:80px 1fr 1fr;
-  gap:48px;
+  grid-template-columns:60px 1fr 340px;
+  gap:60px;
   align-items:start;
   transition:background .25s;
 }
-.case:hover{background:#0F0E0C}
+.case:last-child{border-bottom:1px solid var(--border);margin-bottom:0}
+.case:hover{background:var(--bg-surface)}
 .case-num{
-  font-family:var(--mono);
-  font-size:11px;color:var(--dim);
-  letter-spacing:.1em;padding-top:6px;
-  text-align:right;
+  font-family:var(--mono);font-size:11px;
+  color:var(--text-dim);
+  padding-top:4px;text-align:right;
+  letter-spacing:.06em;
 }
-.case-meta{}
-.case-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.case-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
 .tag{
-  padding:3px 9px;border-radius:3px;
-  font-family:var(--mono);font-size:10px;
+  padding:4px 10px;border-radius:3px;
+  font-family:var(--mono);font-size:11px;
   letter-spacing:.06em;font-weight:500;
-  border:1px solid;
+  text-transform:uppercase;border:1px solid;
 }
-.tag-o{color:var(--accent);border-color:rgba(232,80,10,.3);background:rgba(232,80,10,.07)}
-.tag-g{color:var(--green);border-color:rgba(61,219,122,.3);background:rgba(61,219,122,.07)}
-.tag-b{color:var(--blue);border-color:rgba(79,142,247,.3);background:rgba(79,142,247,.07)}
-.case-title{font-size:clamp(20px,2.2vw,28px);margin-bottom:8px;line-height:1.2}
-.case-sub{font-size:13px;color:var(--dim);font-weight:400;margin-bottom:28px}
-.case-block{margin-bottom:20px}
-.case-block-label{
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--accent);
-  margin-bottom:10px;
-}
-.case-block-text{font-size:14px;color:#A09880;line-height:1.7;font-weight:400}
-.case-block-text strong{color:var(--paper);font-weight:600}
-.case-result{
-  margin-top:24px;
-  padding:20px 22px;
-  background:rgba(61,219,122,.05);
-  border-left:2px solid var(--green);
-  border-radius:0 6px 6px 0;
-}
-.case-result-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
-.case-result-text{font-size:14px;color:#A09880;line-height:1.7;font-weight:400}
-.case-result-text strong{color:var(--green);font-weight:700}
-.case-steps{display:flex;flex-direction:column;gap:16px}
-.step{display:flex;gap:14px;align-items:flex-start}
-.step-n{
-  width:22px;height:22px;border-radius:50%;
-  flex-shrink:0;margin-top:1px;
-  background:rgba(232,80,10,.12);
-  border:1px solid rgba(232,80,10,.3);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:500;
-}
-.step-text{font-size:13px;color:#8C8473;line-height:1.65;font-weight:400}
-.step-text strong{color:#C8BFA8;font-weight:600}
+.tag-a{color:var(--accent);border-color:var(--accent-bd);background:var(--accent-dim)}
+.tag-b{color:var(--sky);border-color:rgba(37,99,196,.22);background:rgba(37,99,196,.06)}
+.tag-c{color:var(--green);border-color:var(--green-bd);background:var(--green-dim)}
 
-/* ─── STACK ───────────────────────────────────────── */
-.stack-section{background:var(--faint);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
-.stack-cell{
-  background:var(--faint);
-  padding:32px 28px;
-  transition:background .2s;
-  cursor:default;
+.case-title{font-size:clamp(22px,2.3vw,30px);line-height:1.14;margin-bottom:10px}
+.case-client{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:32px;letter-spacing:.04em}
+
+.blk{margin-bottom:28px}
+.blk-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
+.blk-text{font-size:14px;color:var(--text-sub);line-height:1.72;font-weight:400}
+.blk-text strong{color:var(--text);font-weight:600}
+
+.result-bar{
+  padding:18px 22px;
+  background:var(--green-dim);
+  border-left:2px solid var(--green);
+  border-radius:0 4px 4px 0;
 }
-.stack-cell:hover{background:#161511}
-.stack-cat{
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--dim);
-  margin-bottom:28px;padding-bottom:14px;
+.result-bar .blk-label{color:var(--green)}
+.result-bar .blk-text{color:var(--text-sub)}
+.result-bar .blk-text strong{color:var(--green);font-weight:700}
+
+.steps-hd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:22px}
+.step-row{display:flex;gap:14px;margin-bottom:20px}
+.step-row:last-child{margin-bottom:0}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  background:var(--accent-dim);
+  border:1px solid var(--accent-bd);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:600;
+}
+.step-text{font-size:13px;color:var(--text-sub);line-height:1.68;font-weight:400}
+.step-text strong{color:var(--text);font-weight:600}
+
+/* SOCIAL PROOF */
+.proof-section{
+  background:var(--bg-surface);
+  border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
 }
-.stack-item{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.stack-item:last-child{margin-bottom:0}
-.stack-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.stack-name{font-size:14px;font-weight:600;color:var(--paper)}
-.stack-desc{font-size:12px;color:var(--dim);font-weight:400;margin-left:18px;margin-top:2px}
-
-/* ─── PROCESS ─────────────────────────────────────── */
-.process-steps{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  position:relative;gap:0;
+.proof-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
 }
-.process-steps::before{
-  content:'';
-  position:absolute;top:18px;left:calc(12.5% + 9px);
-  right:calc(12.5% + 9px);
-  height:1px;background:var(--border);z-index:0;
+.proof-card{
+  background:var(--bg-surface);
+  padding:40px 36px;
+  position:relative;
 }
-.p-step{padding:0 24px}
-.p-step-top{display:flex;align-items:center;gap:12px;margin-bottom:20px;position:relative;z-index:1}
-.p-step-circle{
+.proof-card::before{
+  content:'\201C';
+  position:absolute;top:28px;right:32px;
+  font-family:var(--serif);font-size:56px;
+  line-height:1;color:var(--accent);
+  opacity:.22;
+  font-style:normal;
+}
+.proof-quote{
+  font-size:14px;color:var(--text-sub);
+  line-height:1.76;
+  font-style:italic;font-family:var(--serif);
+  margin-bottom:28px;
+}
+.proof-author{display:flex;align-items:center;gap:12px}
+.proof-initials{
   width:36px;height:36px;border-radius:50%;
-  flex-shrink:0;
-  background:var(--faint);border:1px solid var(--border);
+  background:var(--accent-dim);
+  border:1px solid var(--accent-bd);
   display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;
+  color:var(--accent);font-weight:600;flex-shrink:0;
 }
-.p-step-circle.active{background:var(--accent);border-color:var(--accent)}
-.p-step-n{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:500}
-.p-step-title{font-size:15px;font-weight:700;margin-bottom:10px}
-.p-step-text{font-size:13px;color:var(--dim);line-height:1.65;font-weight:400}
+.proof-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.proof-role{font-size:12px;color:var(--text-dim);font-weight:400;margin-top:2px}
 
-/* ─── CONTACT ─────────────────────────────────────── */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
-.contact-left{}
+/* STACK */
+.stack-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.stack-cell{
+  background:var(--bg-surface);
+  padding:32px 28px;
+  transition:background .2s;
+}
+.stack-cell:hover{background:var(--bg-raised)}
+.stack-cat{
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:24px;padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.stack-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.stack-row:last-child{margin-bottom:0}
+.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.s-name{font-size:14px;font-weight:600;color:var(--text)}
+.s-desc{font-size:12px;color:var(--text-dim);margin-top:2px;font-weight:400}
+
+/* PROCESS */
+.process-section{
+  background:var(--bg-raised);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.process-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  position:relative;
+}
+.process-grid::before{
+  content:'';position:absolute;
+  top:17px;
+  left:calc(12.5% + 9px);right:calc(12.5% + 9px);
+  height:1px;background:var(--border-mid);z-index:0;
+}
+.ps{padding:0 24px}
+.ps-top{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;position:relative;z-index:1;
+}
+.ps-circle{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:var(--bg-surface);
+  border:1px solid var(--border-mid);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .25s,background .25s;
+}
+.ps:hover .ps-circle{border-color:var(--accent);background:var(--accent-dim)}
+.ps-circle.active{background:var(--accent);border-color:var(--accent)}
+.ps-idx{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.ps-title{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--text)}
+.ps-text{font-size:13px;color:var(--text-sub);line-height:1.65;font-weight:400}
+
+/* PRICING */
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.price-card{
+  background:var(--bg-surface);
+  padding:44px 36px;
+  position:relative;
+  transition:background .2s;
+}
+.price-card:hover{background:var(--bg-raised)}
+.price-card.featured{
+  background:var(--bg-raised);
+  border-top:2px solid var(--accent);
+}
+.price-tier{
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:24px;display:block;
+}
+.price-card.featured .price-tier{color:var(--accent)}
+.price-amount{
+  font-size:44px;font-weight:800;letter-spacing:-.04em;
+  line-height:1;margin-bottom:6px;color:var(--text);
+}
+.price-amount sup{font-size:20px;font-weight:700;vertical-align:super;letter-spacing:0}
+.price-from{font-size:12px;color:var(--text-dim);margin-bottom:28px;font-weight:400}
+.price-desc{font-size:13px;color:var(--text-sub);line-height:1.68;margin-bottom:28px;font-weight:400}
+.price-list{list-style:none;margin-bottom:36px}
+.price-list li{
+  font-size:13px;color:var(--text-sub);
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.price-list li:last-child{border-bottom:none}
+.price-list li::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--accent);flex-shrink:0;
+}
+.price-badge{
+  position:absolute;top:-1px;right:32px;
+  padding:4px 12px;
+  border-radius:0 0 4px 4px;
+  background:var(--accent);
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:#fff;font-weight:600;
+}
+
+/* CONTACT */
+.contact-section{
+  background:var(--bg-raised);
+  border-top:1px solid var(--border);
+}
+.contact-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:96px;align-items:start;
+}
 .contact-quote{
   font-family:var(--serif);font-style:italic;
-  font-size:clamp(20px,2.5vw,32px);
-  line-height:1.4;color:var(--paper);
-  margin-bottom:36px;
+  font-size:clamp(22px,2.6vw,36px);
+  line-height:1.38;color:var(--text);
+  margin-bottom:32px;
 }
 .contact-quote em{color:var(--accent);font-style:normal}
-.contact-attrs{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
-.contact-attr{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--dim)}
-.contact-attr-icon{width:32px;height:32px;border-radius:6px;background:var(--faint);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.contact-right{}
-.form{display:flex;flex-direction:column;gap:18px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.trust-list{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
+.trust-row{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text-sub)}
+.trust-icon{
+  width:32px;height:32px;border-radius:4px;
+  background:var(--accent-dim);border:1px solid var(--accent-bd);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.contact-box{
+  padding:20px 24px;
+  background:var(--bg-surface);
+  border:1px solid var(--border-mid);
+  border-radius:6px;
+}
+.contact-box p{font-family:var(--mono);font-size:12px;line-height:2;color:var(--text-sub)}
+.contact-box p span{color:var(--accent)}
+
+/* Multi-step form */
+.step-progress{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:32px;
+}
+.sp-node{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  flex-shrink:0;transition:all .25s;
+}
+.sp-node.done{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.sp-node.current{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-bd)}
+.sp-node.pending{background:var(--bg-surface);color:var(--text-dim);border:1px solid var(--border-mid)}
+.sp-line{flex:1;height:1px;background:var(--border-mid)}
+
+.mstep{display:none}
+.mstep.active{display:block}
+.step-title{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.step-sub{font-size:13px;color:var(--text-sub);margin-bottom:24px;font-weight:400}
+
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-dim);
+}
 .field input,
 .field select,
 .field textarea{
-  background:#111009;
-  border:1px solid var(--border);
-  border-radius:6px;
+  background:var(--bg-surface);
+  border:1px solid var(--border-mid);
+  border-radius:4px;
   padding:11px 14px;
-  color:var(--paper);
+  color:var(--text);
   font-family:var(--sans);font-size:14px;font-weight:400;
   outline:none;
   transition:border-color .2s;
   width:100%;
 }
-.field input::placeholder,
-.field textarea::placeholder{color:var(--dim)}
-.field select{cursor:pointer;appearance:none}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-dim)}
+.field select{appearance:none;cursor:pointer}
 .field input:focus,
 .field select:focus,
-.field textarea:focus{border-color:rgba(232,80,10,.5)}
-.field textarea{resize:vertical;min-height:110px}
-.check-row{display:flex;align-items:flex-start;gap:10px}
-.check-row input[type=checkbox]{
-  width:14px;height:14px;margin-top:2px;
-  flex-shrink:0;accent-color:var(--accent);cursor:pointer;
+.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:104px}
+
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.opt-btn{
+  padding:13px 14px;
+  border:1px solid var(--border-mid);
+  border-radius:4px;
+  background:var(--bg-surface);
+  color:var(--text-sub);
+  font-family:var(--sans);font-size:13px;
+  text-align:left;cursor:pointer;
+  transition:border-color .2s,background .2s,color .2s;
+  font-weight:500;
 }
-.check-row span{font-size:12px;color:var(--dim);line-height:1.55}
-.submit-btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:15px;border-radius:6px;
-  background:var(--accent);color:#fff;
+.opt-btn:hover{border-color:var(--accent-bd);background:var(--accent-dim);color:var(--text)}
+.opt-btn.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--text)}
+
+.form-nav{display:flex;gap:10px;margin-top:18px;align-items:center;justify-content:flex-end}
+.btn-back{
+  padding:11px 20px;
+  border:1px solid var(--border-mid);
+  border-radius:4px;
+  background:transparent;
+  color:var(--text-sub);
+  font-family:var(--sans);font-weight:600;font-size:13px;
+  cursor:pointer;transition:all .2s;
+}
+.btn-back:hover{color:var(--text);background:var(--bg-raised)}
+.btn-next{
+  flex:1;padding:13px 20px;
+  border-radius:4px;background:var(--accent);color:#fff;
   font-family:var(--sans);font-weight:700;font-size:14px;
   border:none;cursor:pointer;
-  transition:background .2s,transform .15s;
-  width:100%;
+  transition:opacity .2s,transform .15s var(--ease);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:-.01em;
 }
-.submit-btn:hover{background:#cf4208;transform:translateY(-1px)}
+.btn-next:hover{opacity:.88;transform:translateY(-1px)}
+
 .success-box{
-  display:none;
-  text-align:center;padding:48px 0;
+  display:none;text-align:center;padding:52px 20px;
 }
-.success-icon{
-  width:56px;height:56px;border-radius:50%;
-  background:rgba(61,219,122,.1);
-  border:1px solid rgba(61,219,122,.3);
+.s-check{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--green-dim);border:1px solid var(--green-bd);
   display:flex;align-items:center;justify-content:center;
-  margin:0 auto 18px;
+  margin:0 auto 20px;
 }
 
-/* ─── FOOTER ─────────────────────────────────────────*/
+/* FOOTER */
 footer{
   padding:36px 0;
   border-top:1px solid var(--border);
+  background:var(--bg);
 }
-.footer-inner{
-  display:flex;align-items:center;justify-content:space-between;
+.footer-row{
+  display:flex;align-items:center;
+  justify-content:space-between;
   flex-wrap:wrap;gap:16px;
 }
-.footer-status{display:flex;align-items:center;gap:8px}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 3s ease-in-out infinite}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:12px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em;transition:color .2s}
-.footer-links a:hover{color:var(--paper)}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-logo{
+  width:26px;height:26px;border-radius:5px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.footer-name{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.availability{display:flex;align-items:center;gap:8px}
+.av-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  animation:pulse-av 3s ease-in-out infinite;
+}
+@keyframes pulse-av{0%,100%{opacity:1}50%{opacity:.4}}
+.av-text{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.footer-links{display:flex;gap:28px}
+.footer-links a{
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  color:var(--text-dim);transition:color .2s;
+}
+.footer-links a:hover{color:var(--text)}
 
-/* ─── DIVIDER ──────────────────────────────────────── */
-.divider{height:1px;background:var(--border)}
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
 
-/* ─── REVEAL ANIMATION ─────────────────────────────── */
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
-.reveal.in{opacity:1;transform:none}
-
-/* ─── RESPONSIVE ────────────────────────────────────── */
-@media(max-width:900px){
-  .hero-content{grid-template-columns:1fr}
-  .hero-right{flex-direction:row;gap:0}
-  .hero-stat-row{flex:1;flex-direction:column;gap:4px;padding:16px 12px;border-bottom:none;border-right:1px solid var(--border)}
-  .hero-stat-row:last-child{border-right:none}
-  .hero-stat-num{font-size:36px}
+/* RESPONSIVE */
+@media(max-width:980px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-panel{display:grid;grid-template-columns:repeat(2,1fr)}
+  .hm-row{border-bottom:none;border-right:1px solid var(--border)}
+  .hm-row:nth-child(even){border-right:none}
   .case{grid-template-columns:1fr}
   .case-num{display:none}
+  .proof-grid,.stack-grid{grid-template-columns:repeat(2,1fr)}
+  .process-grid{grid-template-columns:repeat(2,1fr);gap:36px}
+  .process-grid::before{display:none}
+  .pricing-grid{grid-template-columns:1fr}
   .contact-grid{grid-template-columns:1fr}
-  .process-steps{grid-template-columns:1fr 1fr;gap:32px}
-  .process-steps::before{display:none}
   nav .nav-links{display:none}
 }
 @media(max-width:600px){
-  .container{padding:0 20px}
+  .wrap{padding:0 24px}
   section{padding:72px 0}
-  .form-row{grid-template-columns:1fr}
-  .process-steps{grid-template-columns:1fr}
+  .proof-grid,.stack-grid{grid-template-columns:1fr}
+  .f2,.opt-grid{grid-template-columns:1fr}
+  .hero-panel{grid-template-columns:1fr}
+  .hm-row{border-right:none;border-bottom:1px solid var(--border)}
+  .hm-row:last-child{border-bottom:none}
+  .process-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body class="lang-en">
 
-<!-- ════ NAV ════════════════════════════════════════ -->
-<nav>
-  <div class="nav-logo">
-    <div class="nav-logo-mark">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-brand">
+    <div class="nav-logo">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <span class="nav-logo-name">Flowscale</span>
+    <span class="nav-name">Flowscale</span>
   </div>
 
   <div class="nav-links">
     <a href="#portfolio"><span class="en">Work</span><span class="fr">Projets</span></a>
     <a href="#stack"><span class="en">Stack</span><span class="fr">Technologies</span></a>
-    <a href="#process"><span class="en">Process</span><span class="fr">Méthode</span></a>
+    <a href="#process"><span class="en">Process</span><span class="fr">Methode</span></a>
+    <a href="#pricing"><span class="en">Pricing</span><span class="fr">Tarifs</span></a>
     <a href="#contact"><span class="en">Contact</span><span class="fr">Contact</span></a>
   </div>
 
   <div class="nav-right">
-    <div class="lang-pill">
-      <button class="lang-btn on" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme" onclick="toggleTheme()">
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none">
+        <path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="lang-switch">
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
       <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
     </div>
   </div>
 </nav>
 
 
-<!-- ════ HERO ════════════════════════════════════════ -->
+<!-- HERO -->
 <section class="hero">
   <div class="hero-bg" id="heroBg"></div>
-  <div class="hero-overlay"></div>
+  <div class="hero-vignette"></div>
 
-  <div class="container hero-content">
-    <div class="hero-left">
-      <div class="hero-tag">
-        <div class="hero-tag-dot"></div>
-        <span class="label en" style="color:var(--accent);margin:0">AI Automation Studio</span>
-        <span class="label fr" style="color:var(--accent);margin:0">Studio d'Automatisation IA</span>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="hero-eyebrow">
+        <div class="eyebrow-pulse"></div>
+        <span class="eyebrow-text en">AI Automation Studio &mdash; West Africa &amp; Global</span>
+        <span class="eyebrow-text fr">Studio Automatisation IA &mdash; Afrique de l'Ouest &amp; International</span>
       </div>
 
-      <h1 class="hero-h1 en">
-        We build<br/><em>invisible machines</em><br/>that work for you.
-      </h1>
-      <h1 class="hero-h1 fr">
-        Nous construisons<br/>des <em>machines invisibles</em><br/>qui travaillent pour vous.
+      <h1 class="hero-h1">
+        <span class="en">
+          Your business<br/>
+          <span class="hero-h1-accent">runs itself</span><br/>
+          <span class="hero-h1-italic">while you sleep.</span>
+        </span>
+        <span class="fr">
+          Votre business<br/>
+          <span class="hero-h1-accent">tourne seul</span><br/>
+          <span class="hero-h1-italic">pendant que vous dormez.</span>
+        </span>
       </h1>
 
-      <p class="hero-sub en">
-        n8n workflows and AI agents that replace repetitive tasks,
-        qualify leads 24/7, and connect every tool in your stack —
-        without a single line of manual code.
+      <p class="hero-body en">
+        We build n8n workflows and AI agents that handle lead qualification,
+        client onboarding, and repetitive operations &mdash; autonomously, around the clock.
+        Deployed in production for companies across Africa, Europe, and the US.
       </p>
-      <p class="hero-sub fr">
-        Des workflows n8n et des agents IA qui éliminent les tâches répétitives,
-        qualifient vos leads en continu et connectent tous vos outils —
-        sans aucune ligne de code manuel.
+      <p class="hero-body fr">
+        Nous construisons des workflows n8n et des agents IA qui gerent la qualification
+        de leads, l'onboarding clients et les operations repetitives &mdash; de facon autonome,
+        24h/24. Deployes en production pour des entreprises en Afrique, Europe et aux Etats-Unis.
       </p>
 
       <div class="hero-ctas">
-        <a href="#portfolio" class="btn-a">
-          <span class="en">View case studies</span>
-          <span class="fr">Voir les projets</span>
-          <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a href="#contact" class="btn-b">
+        <a href="#contact" class="btn-primary">
           <span class="en">Get a free audit</span>
           <span class="fr">Audit gratuit</span>
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#portfolio" class="btn-secondary">
+          <span class="en">See case studies</span>
+          <span class="fr">Voir les projets</span>
         </a>
       </div>
     </div>
 
-    <div class="hero-right">
-      <div class="hero-stat-row">
-        <div class="hero-stat-num">24/7</div>
-        <div class="hero-stat-label"><span class="en">AI systems that never sleep</span><span class="fr">Systèmes IA qui ne dorment jamais</span></div>
+    <div class="hero-panel">
+      <div class="hm-row">
+        <div class="hm-num" style="color:var(--accent)">95%</div>
+        <div class="hm-label">
+          <strong class="en">Tasks eliminated</strong>
+          <strong class="fr">Taches eliminées</strong>
+          <span class="en">per client on average</span>
+          <span class="fr">par client en moyenne</span>
+        </div>
       </div>
-      <div class="hero-stat-row">
-        <div class="hero-stat-num" style="color:var(--accent)">95%</div>
-        <div class="hero-stat-label"><span class="en">Repetitive tasks eliminated per client</span><span class="fr">Tâches répétitives éliminées par client</span></div>
+      <div class="hm-row">
+        <div class="hm-num">24/7</div>
+        <div class="hm-label">
+          <strong class="en">Always running</strong>
+          <strong class="fr">Toujours actif</strong>
+          <span class="en">Zero-downtime agents</span>
+          <span class="fr">Agents sans interruption</span>
+        </div>
       </div>
-      <div class="hero-stat-row">
-        <div class="hero-stat-num">&lt;3s</div>
-        <div class="hero-stat-label"><span class="en">Average agent response time</span><span class="fr">Temps de réponse moyen des agents</span></div>
+      <div class="hm-row">
+        <div class="hm-num" style="color:var(--green)">&lt;3s</div>
+        <div class="hm-label">
+          <strong class="en">Response time</strong>
+          <strong class="fr">Temps de reponse</strong>
+          <span class="en">Average agent reply</span>
+          <span class="fr">Reponse agent moyen</span>
+        </div>
       </div>
-      <div class="hero-stat-row" style="border-bottom:none">
-        <div class="hero-stat-num" style="color:var(--green)">3+</div>
-        <div class="hero-stat-label"><span class="en">Industries shipped to production</span><span class="fr">Secteurs déployés en production</span></div>
+      <div class="hm-row">
+        <div class="hm-num">3+</div>
+        <div class="hm-label">
+          <strong class="en">Industries live</strong>
+          <strong class="fr">Secteurs deployes</strong>
+          <span class="en">In production today</span>
+          <span class="fr">En production aujourd'hui</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════ MARQUEE ═══════════════════════════════════ -->
-<div class="marquee-wrap">
-  <div class="marquee-track" id="mq">
-    <!-- filled by JS -->
+<!-- CLIENTS STRIP -->
+<div class="strip">
+  <div class="wrap">
+    <div class="strip-inner">
+      <span class="strip-label en">Clients</span>
+      <span class="strip-label fr">Clients</span>
+      <div class="strip-div"></div>
+      <span class="strip-item">Elite Immo</span>
+      <div class="strip-div"></div>
+      <span class="strip-item">Clinique Divine Misericorde</span>
+      <div class="strip-div"></div>
+      <span class="strip-item">FR Immo</span>
+      <div class="strip-div"></div>
+      <span class="strip-item" style="color:var(--text-dim)">
+        <span class="en">Real Estate &middot; Healthcare &middot; SaaS</span>
+        <span class="fr">Immobilier &middot; Sante &middot; SaaS</span>
+      </span>
+    </div>
   </div>
 </div>
 
 
-<!-- ════ PORTFOLIO ═════════════════════════════════ -->
-<section id="portfolio" style="padding:80px 0 0">
-  <div class="container">
+<!-- PORTFOLIO -->
+<section id="portfolio" class="portfolio-section">
+  <div class="wrap">
     <div class="sh reveal">
-      <p class="label en">Selected Work</p>
-      <p class="label fr">Travaux Sélectionnés</p>
-      <h2 class="sh-title en">Three systems.<br/>Real outcomes.</h2>
-      <h2 class="sh-title fr">Trois systèmes.<br/>Des résultats réels.</h2>
-      <p class="sh-sub en">Each case study is a production workflow — not a demo. Built for real clients, deployed, and running autonomously right now.</p>
-      <p class="sh-sub fr">Chaque étude de cas est un workflow en production — pas une démo. Construit pour de vrais clients, déployé et tournant de manière autonome en ce moment.</p>
+      <span class="t-label en">Selected Work</span>
+      <span class="t-label fr">Travaux selectionnés</span>
+      <h2 class="sh-h2 en">Three systems.<br/>Real outcomes.</h2>
+      <h2 class="sh-h2 fr">Trois systemes.<br/>Des resultats concrets.</h2>
+      <p class="sh-sub en">Every case study below is running in production right now &mdash; not a mockup, not a demo. Built for paying clients and earning its keep autonomously.</p>
+      <p class="sh-sub fr">Chaque etude ci-dessous tourne en production &mdash; pas une maquette. Construit pour de vrais clients, deploye, et qui genere de la valeur de facon autonome.</p>
     </div>
-  </div>
 
-  <div class="divider"></div>
-  <div class="cases">
-
-    <!-- ── CASE 01 ── Real Estate ── -->
-    <div class="case container reveal">
+    <!-- CASE 01 -->
+    <div class="case reveal">
       <div class="case-num">01 /</div>
-      <div class="case-meta">
+      <div>
         <div class="case-tags">
-          <span class="tag tag-o"><span class="en">Real Estate</span><span class="fr">Immobilier</span></span>
+          <span class="tag tag-a en">Real Estate</span>
+          <span class="tag tag-a fr">Immobilier</span>
           <span class="tag tag-b">WhatsApp</span>
           <span class="tag tag-b">NocoDB</span>
-          <span class="tag tag-b">Cloudinary</span>
           <span class="tag tag-b">GPT-4o</span>
+          <span class="tag tag-b">Cloudinary</span>
         </div>
-        <h3 class="case-title en">AI Real Estate<br/>Lead Qualification Agent</h3>
+        <h3 class="case-title en">AI Real Estate Lead<br/>Qualification Agent</h3>
         <h3 class="case-title fr">Agent IA de Qualification<br/>de Leads Immobiliers</h3>
-        <p class="case-sub">Elite Immo — WhatsApp Automation</p>
-
-        <div class="case-block">
-          <p class="case-block-label en">The Problem</p>
-          <p class="case-block-label fr">Le Problème</p>
-          <p class="case-block-text en">Agents spent 3+ hours/day answering the same WhatsApp questions: price, location, availability. High-intent leads disappeared overnight when agents went offline. There was no systematic capture of prospect data, and property photos couldn't be served through WhatsApp due to private S3 storage.</p>
-          <p class="case-block-text fr">Les agents passaient 3h+ par jour à répondre aux mêmes questions WhatsApp. Les leads à forte intention disparaissaient la nuit. Aucune capture systématique des données, et les photos de biens ne pouvaient pas être envoyées sur WhatsApp à cause du stockage S3 privé.</p>
+        <p class="case-client">Elite Immo &mdash; WhatsApp Automation</p>
+        <div class="blk">
+          <p class="blk-label en">The situation</p>
+          <p class="blk-label fr">La situation</p>
+          <p class="blk-text en">Agents burned <strong>3+ hours daily</strong> answering the same WhatsApp questions about price, zone, and availability. After 6pm, high-intent leads hit an offline team and disappeared. Property photos could not be served through WhatsApp because images sat on private Amazon S3 storage &mdash; an unsolved bottleneck.</p>
+          <p class="blk-text fr">Les agents brulaient <strong>3h+ par jour</strong> a repondre aux memes questions WhatsApp. Apres 18h, les leads a forte intention tombaient dans le vide. Les photos de biens ne pouvaient pas etre envoyees via WhatsApp car les images etaient sur Amazon S3 prive &mdash; un blocage non resolu.</p>
         </div>
-
-        <div class="case-result">
-          <p class="case-result-label en">The Result</p>
-          <p class="case-result-label fr">Le Résultat</p>
-          <p class="case-result-text en">Automated lead qualification 24/7. Prospects get property photos, pricing and descriptions in <strong>under 3 seconds</strong>. All qualified leads auto-logged to Google Sheets. <strong>Zero human effort per lead. Zero missed inquiry.</strong></p>
-          <p class="case-result-text fr">Qualification automatique des leads 24h/24. Les prospects reçoivent photos, prix et descriptions en <strong>moins de 3 secondes</strong>. Tous les leads qualifiés enregistrés automatiquement dans Google Sheets. <strong>Zéro effort humain par lead. Zéro demande manquée.</strong></p>
+        <div class="result-bar">
+          <p class="blk-label en">What changed</p>
+          <p class="blk-label fr">Ce qui a change</p>
+          <p class="blk-text en">Automated qualification runs 24/7. Prospects receive photos, pricing, and descriptions in <strong>under 3 seconds</strong>. All qualified leads auto-logged to Google Sheets. <strong>Zero manual effort per inquiry. Zero missed lead.</strong></p>
+          <p class="blk-text fr">Qualification automatique 24h/24. Les prospects recoivent photos, prix et descriptions en <strong>moins de 3 secondes</strong>. Tous les leads qualifies enregistres automatiquement. <strong>Zero travail manuel. Zero lead manque.</strong></p>
         </div>
       </div>
-
-      <div class="case-steps">
-        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
-        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
-        <div class="step">
-          <div class="step-n">1</div>
-          <p class="step-text en"><strong>Webhook Receiver (WHAPI):</strong> Captures every WhatsApp message — text, audio transcribed by Whisper, images analyzed by GPT-4o Vision — and routes each to the right processing branch.</p>
-          <p class="step-text fr"><strong>Webhook WHAPI:</strong> Capture chaque message WhatsApp — texte, audio transcrit par Whisper, images analysées par GPT-4o Vision — et route chacun vers la bonne branche.</p>
+      <div>
+        <p class="steps-hd en">How it works</p>
+        <p class="steps-hd fr">Comment ca marche</p>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <p class="step-text en"><strong>WHAPI Webhook</strong> &mdash; captures every WhatsApp message. Text, voice (Whisper transcription), and images (GPT-4o Vision) all processed and routed to the correct branch.</p>
+          <p class="step-text fr"><strong>Webhook WHAPI</strong> &mdash; capture chaque message WhatsApp. Texte, audio (Whisper), images (GPT-4o Vision) traites et routes vers la bonne branche.</p>
         </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <p class="step-text en"><strong>AI Agent + NocoDB catalog:</strong> GPT-4o collects 3 criteria (property type, zone, budget) via conversational memory, then queries the NocoDB API in real time. Strict anti-hallucination rules — only real listings are presented.</p>
-          <p class="step-text fr"><strong>Agent IA + Catalogue NocoDB:</strong> GPT-4o collecte 3 critères via mémoire conversationnelle, puis interroge l'API NocoDB en temps réel. Règles anti-hallucination strictes — uniquement des biens réels.</p>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <p class="step-text en"><strong>GPT-4o Agent + NocoDB</strong> &mdash; collects 3 criteria via conversational memory, then queries the live catalog. Strict anti-hallucination rules: only verified listings are shown.</p>
+          <p class="step-text fr"><strong>Agent GPT-4o + NocoDB</strong> &mdash; collecte 3 criteres via memoire conversationnelle, interroge le catalogue en temps reel. Anti-hallucination stricte.</p>
         </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <p class="step-text en"><strong>Cloudinary Bridge (the hard part):</strong> NocoDB images live on private Amazon S3. n8n authenticates with the NocoDB API, downloads the binary file, and re-uploads it to Cloudinary — generating a public URL that WhatsApp can display. No URL forwarding, no 403 errors.</p>
-          <p class="step-text fr"><strong>Bridge Cloudinary:</strong> Les images NocoDB sont sur S3 privé. n8n s'authentifie, télécharge le fichier binaire et le transfère vers Cloudinary — générant une URL publique affichable sur WhatsApp. Sans redirection d'URL, sans erreur 403.</p>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <p class="step-text en"><strong>Cloudinary Bridge</strong> &mdash; n8n authenticates with the NocoDB API, downloads the binary from S3, re-uploads to Cloudinary, generating a public URL WhatsApp can render. No 403 errors, no workarounds.</p>
+          <p class="step-text fr"><strong>Bridge Cloudinary</strong> &mdash; n8n s'authentifie NocoDB, telecharge le binaire S3, transfere vers Cloudinary, genere une URL publique affichable sur WhatsApp. Sans erreur 403.</p>
         </div>
-        <div class="step">
-          <div class="step-n">4</div>
-          <p class="step-text en"><strong>Google Sheets CRM:</strong> Once a qualified lead gives their name, the AI agent auto-appends a row with: name, WhatsApp number, property type, zone, budget, and qualification status.</p>
-          <p class="step-text fr"><strong>CRM Google Sheets:</strong> Une fois qualifié, l'agent IA enregistre automatiquement : nom, numéro WhatsApp, type de bien, zone, budget et statut de qualification.</p>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <p class="step-text en"><strong>Google Sheets CRM</strong> &mdash; name, WhatsApp number, property type, zone, budget, and status auto-appended the moment a lead qualifies.</p>
+          <p class="step-text fr"><strong>CRM Google Sheets</strong> &mdash; nom, numero, type de bien, zone, budget et statut enregistres automatiquement a la qualification.</p>
         </div>
       </div>
     </div>
 
-    <!-- ── CASE 02 ── Healthcare ── -->
-    <div class="case container reveal">
+    <!-- CASE 02 -->
+    <div class="case reveal">
       <div class="case-num">02 /</div>
-      <div class="case-meta">
+      <div>
         <div class="case-tags">
-          <span class="tag tag-b"><span class="en">Healthcare</span><span class="fr">Santé</span></span>
+          <span class="tag tag-b en">Healthcare</span>
+          <span class="tag tag-b fr">Sante</span>
           <span class="tag tag-b">Supabase</span>
           <span class="tag tag-b">Google Calendar</span>
           <span class="tag tag-b">GPT-4o mini</span>
         </div>
-        <h3 class="case-title en">Clinical WhatsApp<br/>Appointment &amp; Triage AI</h3>
-        <h3 class="case-title fr">Assistant IA Clinique —<br/>Prise de RDV &amp; Triage Médical</h3>
-        <p class="case-sub">Clinique Divine Miséricorde — Full Patient Automation</p>
-
-        <div class="case-block">
-          <p class="case-block-label en">The Problem</p>
-          <p class="case-block-label fr">Le Problème</p>
-          <p class="case-block-text en">The reception team was overwhelmed handling WhatsApp bookings outside business hours. Symptom assessment was ad hoc and inconsistent. Appointment reminders were sent manually — and often forgotten. Patient data was never persisted across conversations, forcing patients to repeat themselves every time.</p>
-          <p class="case-block-text fr">L'équipe d'accueil était submergée par les messages WhatsApp hors horaires. L'évaluation des symptômes était aléatoire. Les rappels de RDV étaient manuels et souvent oubliés. Les données patients n'étaient pas conservées entre les conversations, forçant les patients à tout répéter.</p>
+        <h3 class="case-title en">Clinical Appointment<br/>&amp; Triage AI</h3>
+        <h3 class="case-title fr">IA Clinique &mdash; Prise de RDV<br/>&amp; Triage Medical</h3>
+        <p class="case-client">Clinique Divine Misericorde &mdash; Patient Automation</p>
+        <div class="blk">
+          <p class="blk-label en">The situation</p>
+          <p class="blk-label fr">La situation</p>
+          <p class="blk-text en">Reception was overwhelmed handling WhatsApp bookings outside business hours. Symptom assessment was inconsistent. Appointment reminders were sent manually and frequently forgotten. Patients had to repeat their full history every conversation because nothing persisted between sessions.</p>
+          <p class="blk-text fr">L'accueil etait submerge par les reservations WhatsApp hors horaires. Le triage des symptomes etait aleatoire. Les rappels de RDV envoyes manuellement et souvent oublies. Les patients devaient tout repeter a chaque conversation.</p>
         </div>
-
-        <div class="case-result">
-          <p class="case-result-label en">The Result</p>
-          <p class="case-result-label fr">Le Résultat</p>
-          <p class="case-result-text en">Reception workload cut by ~80%. Critical cases are triaged and escalated before the patient arrives. No-show rate dropped significantly with automated 30-min WhatsApp reminders. <strong>Full booking loop completed in under 2 minutes. System runs 24/7 with no human involved.</strong></p>
-          <p class="case-result-text fr">Charge de travail de l'accueil réduite de ~80%. Les cas critiques sont triés avant l'arrivée du patient. Taux d'absence réduit grâce aux rappels automatiques. <strong>Cycle de réservation complet en moins de 2 minutes. Le système tourne 24h/24 sans intervention humaine.</strong></p>
+        <div class="result-bar">
+          <p class="blk-label en">What changed</p>
+          <p class="blk-label fr">Ce qui a change</p>
+          <p class="blk-text en">Reception workload cut by <strong>approximately 80%</strong>. Critical cases triaged and escalated before the patient arrives. No-show rate dropped with automated 30-minute WhatsApp reminders. <strong>Full booking loop completed in under 2 minutes. Zero human intervention required.</strong></p>
+          <p class="blk-text fr">Charge de travail accueil reduite de <strong>80% environ</strong>. Cas critiques tries avant l'arrivee du patient. Taux d'absence reduit grace aux rappels automatiques. <strong>Cycle complet en moins de 2 minutes. Zero intervention humaine.</strong></p>
         </div>
       </div>
-
-      <div class="case-steps">
-        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
-        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
-        <div class="step">
-          <div class="step-n">1</div>
-          <p class="step-text en"><strong>Persistent Patient Memory (Supabase):</strong> Every conversation is stored with a full patient profile. New vs. returning patients are auto-detected — no more "who are you?" every time. The last 15 messages feed the AI as context.</p>
-          <p class="step-text fr"><strong>Mémoire Patient Persistante (Supabase):</strong> Chaque conversation est stockée avec un profil complet. Nouveau vs ancien patient détecté automatiquement. Les 15 derniers messages alimentent l'IA en contexte.</p>
+      <div>
+        <p class="steps-hd en">How it works</p>
+        <p class="steps-hd fr">Comment ca marche</p>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <p class="step-text en"><strong>Persistent Patient Memory (Supabase)</strong> &mdash; full profile stored per patient. Returning patients are auto-detected. The last 15 messages feed AI context. Patients are never asked to repeat themselves.</p>
+          <p class="step-text fr"><strong>Memoire Patient (Supabase)</strong> &mdash; profil complet stocke. Patients reconnus automatiquement. Les 15 derniers messages alimentent le contexte IA.</p>
         </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <p class="step-text en"><strong>Adaptive Medical Triage Engine:</strong> AI asks 3–4 adaptive questions based on symptom type (pain: 4 questions including intensity; nausea/fever: 3 questions). Urgency scored low → urgent. Staff alerted instantly for high/urgent cases. Suicidal or vital emergencies → "Call 15 NOW".</p>
-          <p class="step-text fr"><strong>Moteur de Triage Médical Adaptatif:</strong> L'IA pose 3–4 questions selon le type de symptôme. Urgence évaluée de faible à urgente. Le personnel est alerté immédiatement pour les cas critiques.</p>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <p class="step-text en"><strong>Adaptive Triage Engine</strong> &mdash; 3 to 4 adaptive questions per symptom type. Urgency scored from low to critical. Staff alerted instantly for high-urgency cases.</p>
+          <p class="step-text fr"><strong>Moteur de Triage Adaptatif</strong> &mdash; 3 a 4 questions selon le symptome. Urgence evaluee de faible a critique. Personnel alerte immediatement pour les cas graves.</p>
         </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <p class="step-text en"><strong>Smart Calendar Scheduler:</strong> Google Calendar checked for real availability (not cached). Agent proposes 3 free slots, patient confirms one, event created instantly with motif and contact info embedded in the description.</p>
-          <p class="step-text fr"><strong>Planificateur Google Calendar:</strong> Disponibilités vérifiées en temps réel. L'agent propose 3 créneaux libres, le patient en choisit un, l'événement est créé instantanément avec motif et coordonnées.</p>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <p class="step-text en"><strong>Smart Calendar Scheduler</strong> &mdash; real-time Google Calendar availability checked. Three free slots proposed. Patient confirms one. Event created instantly with motif and contact details embedded.</p>
+          <p class="step-text fr"><strong>Planificateur Calendar</strong> &mdash; disponibilites verifiees en temps reel. 3 creneaux proposes, patient confirme, evenement cree avec motif et coordonnees.</p>
         </div>
-        <div class="step">
-          <div class="step-n">4</div>
-          <p class="step-text en"><strong>30-min Reminder Cron:</strong> A scheduler runs every 5 minutes, fetches appointments in the 25–35 min window, sends a WhatsApp reminder to the patient AND a notification to the clinic. The calendar event is then updated with "✅ Reminder sent."</p>
-          <p class="step-text fr"><strong>Cron de Rappel 30 min:</strong> Un scheduler tourne toutes les 5 min, récupère les RDV dans la fenêtre 25–35 min, envoie un rappel WhatsApp au patient ET une notification à la clinique.</p>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <p class="step-text en"><strong>30-min Cron Reminder</strong> &mdash; scheduler runs every 5 minutes. Fetches appointments in the 25&ndash;35 minute window. WhatsApp sent to patient and notification to clinic.</p>
+          <p class="step-text fr"><strong>Cron de Rappel 30 min</strong> &mdash; toutes les 5 minutes. Recupere les RDV dans la fenetre 25&ndash;35 min. WhatsApp patient + notification clinique.</p>
         </div>
       </div>
     </div>
 
-    <!-- ── CASE 03 ── CRM Nurturing ── -->
-    <div class="case container reveal">
+    <!-- CASE 03 -->
+    <div class="case reveal">
       <div class="case-num">03 /</div>
-      <div class="case-meta">
+      <div>
         <div class="case-tags">
-          <span class="tag tag-g"><span class="en">CRM / Sales</span><span class="fr">CRM / Ventes</span></span>
+          <span class="tag tag-c en">CRM / Sales</span>
+          <span class="tag tag-c fr">CRM / Ventes</span>
           <span class="tag tag-b">Tally</span>
           <span class="tag tag-b">Gemini 2.5</span>
-          <span class="tag tag-b">Google Sheets</span>
           <span class="tag tag-b">Gmail</span>
+          <span class="tag tag-b">Google Sheets</span>
         </div>
         <h3 class="case-title en">AI-Written Prospect<br/>Nurturing Sequence</h3>
-        <h3 class="case-title fr">Séquence de Nurturing<br/>Rédigée par IA</h3>
-        <p class="case-sub">FR IMMO — J+2 / J+7 / J+14 Email Automation</p>
-
-        <div class="case-block">
-          <p class="case-block-label en">The Problem</p>
-          <p class="case-block-label fr">Le Problème</p>
-          <p class="case-block-text en">70% of post-visit prospects were lost due to zero follow-up. Agents had no time to write personalized emails. Without a pipeline, hot leads cooled within days. There was no signal when a prospect had already converted, causing awkward re-engagement emails to closed deals.</p>
-          <p class="case-block-text fr">70% des prospects après visite étaient perdus faute de suivi. Les agents n'avaient pas le temps d'écrire des emails personnalisés. Sans pipeline, les leads chauds refroidissaient en quelques jours. Aucun signal quand un prospect avait déjà signé.</p>
+        <h3 class="case-title fr">Sequence de Nurturing<br/>Redigee par IA</h3>
+        <p class="case-client">FR Immo &mdash; D+2 / D+7 / D+14 Email Automation</p>
+        <div class="blk">
+          <p class="blk-label en">The situation</p>
+          <p class="blk-label fr">La situation</p>
+          <p class="blk-text en"><strong>70% of post-visit prospects</strong> were lost to zero follow-up. Agents had no bandwidth to write personalized emails. Hot leads went cold within 48 hours. Closed deals kept receiving re-engagement emails, creating an unprofessional impression.</p>
+          <p class="blk-text fr"><strong>70% des prospects apres visite</strong> disparaissaient faute de suivi. Les agents n'avaient pas le temps d'ecrire des emails personnalises. Les leads chauds refroidissaient en 48h. Les deals fermes recevaient encore des relances &mdash; peu professionnel.</p>
         </div>
-
-        <div class="case-result">
-          <p class="case-result-label en">The Result</p>
-          <p class="case-result-label fr">Le Résultat</p>
-          <p class="case-result-text en">3 fully personalized emails per prospect, auto-sent at J+2, J+7, J+14. Agents notified only when a human response is needed — with a direct Google Sheets deep-link. <strong>Zero emails written manually. Sequence runs in perpetuity. Closed deals automatically gated out.</strong></p>
-          <p class="case-result-text fr">3 emails entièrement personnalisés par prospect, envoyés automatiquement à J+2, J+7 et J+14. Agents notifiés uniquement quand une intervention humaine est nécessaire. <strong>Zéro email écrit manuellement. Séquence infinie. Les deals fermés sont automatiquement exclus.</strong></p>
+        <div class="result-bar">
+          <p class="blk-label en">What changed</p>
+          <p class="blk-label fr">Ce qui a change</p>
+          <p class="blk-text en">Three fully personalized emails per prospect, sent at D+2, D+7, and D+14. Agents notified only when a human response is needed. <strong>Zero emails written manually. Closed deals auto-excluded. Sequence runs indefinitely.</strong></p>
+          <p class="blk-text fr">3 emails entierement personnalises par prospect a J+2, J+7 et J+14. Agents notifies uniquement quand l'humain est requis. <strong>Zero email manuel. Deals fermes exclus automatiquement.</strong></p>
         </div>
       </div>
-
-      <div class="case-steps">
-        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
-        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
-        <div class="step">
-          <div class="step-n">1</div>
-          <p class="step-text en"><strong>Tally Form → Google Sheets Trigger:</strong> After each visit, agent fills a Tally form (name, email, property, budget, visit date, status). Data written to Google Sheets in real time. Only prospects with status "Réfléchi" enter the nurturing sequence.</p>
-          <p class="step-text fr"><strong>Formulaire Tally → Déclencheur Google Sheets:</strong> Après chaque visite, l'agent remplit un formulaire Tally. Données écrites dans Google Sheets en temps réel. Seuls les prospects avec le statut "Réfléchi" entrent dans la séquence.</p>
+      <div>
+        <p class="steps-hd en">How it works</p>
+        <p class="steps-hd fr">Comment ca marche</p>
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <p class="step-text en"><strong>Tally Form trigger</strong> &mdash; agent fills a post-visit form. Data written to Google Sheets in real time. Only prospects with status "Undecided" enter the nurturing sequence.</p>
+          <p class="step-text fr"><strong>Declencheur Tally</strong> &mdash; formulaire post-visite. Donnees ecrites dans Google Sheets en temps reel. Seuls les prospects "Indecis" entrent dans la sequence.</p>
         </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <p class="step-text en"><strong>Gemini 2.5 Flash Copywriting:</strong> Each email generated fresh — full prospect context injected. J+2 = warm check-in, no pressure. J+7 = 3 practical buying tips, property subtly mentioned. J+14 = gentle urgency, "other buyers are looking," 10-minute call offer. Markdown asterisks stripped automatically via code node.</p>
-          <p class="step-text fr"><strong>Rédaction Gemini 2.5 Flash:</strong> Chaque email généré fraîchement avec le contexte complet. J+2 = prise de nouvelles, sans pression. J+7 = 3 conseils pratiques, bien mentionné subtilement. J+14 = urgence douce, offre d'appel de 10 minutes.</p>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <p class="step-text en"><strong>Gemini 2.5 Flash copywriting</strong> &mdash; D+2: warm check-in, no pressure. D+7: three practical buying tips, property subtly referenced. D+14: gentle urgency with a 10-minute call offer.</p>
+          <p class="step-text fr"><strong>Redaction Gemini 2.5</strong> &mdash; J+2: prise de nouvelles sans pression. J+7: 3 conseils pratiques. J+14: urgence douce + offre d'appel 10 minutes.</p>
         </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <p class="step-text en"><strong>Smart Status Gate:</strong> Before every send, the workflow re-reads the Google Sheets row. If status is "Fermé" (deal closed), the entire remaining sequence stops — no awkward emails to won clients. Managers get a Gmail notification with a direct deep-link to the exact row.</p>
-          <p class="step-text fr"><strong>Porte de Statut Intelligente:</strong> Avant chaque envoi, le workflow relit la ligne Google Sheets. Si le statut est "Fermé", toute la séquence restante s'arrête. Les managers reçoivent un email avec un lien direct vers la ligne exacte.</p>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <p class="step-text en"><strong>Smart Status Gate</strong> &mdash; before every send, the workflow re-reads the Sheets row. If status is "Closed," the entire remaining sequence stops. No re-engagement emails sent to existing clients.</p>
+          <p class="step-text fr"><strong>Porte de Statut Intelligente</strong> &mdash; avant chaque envoi, le workflow relit la ligne Sheets. Si statut "Ferme", toute la sequence restante s'arrete. Aucun email envoye aux clients existants.</p>
         </div>
       </div>
     </div>
-
-  </div><!-- /cases -->
+  </div>
 </section>
 
 
-<!-- ════ STACK ═══════════════════════════════════════ -->
-<section id="stack" class="stack-section">
-  <div class="container">
-    <div class="sh reveal">
-      <p class="label en">Technology</p>
-      <p class="label fr">Technologies</p>
-      <h2 class="sh-title en">Every tool, chosen<br/>for a reason.</h2>
-      <h2 class="sh-title fr">Chaque outil, choisi<br/>pour une raison.</h2>
-      <p class="sh-sub en">No bloat. No vendor lock-in. Each technology selected because it genuinely outperforms the alternatives for that specific job.</p>
-      <p class="sh-sub fr">Aucun outil superflu. Aucun verrouillage propriétaire. Chaque technologie choisie parce qu'elle surpasse les alternatives pour ce travail spécifique.</p>
+<!-- SOCIAL PROOF -->
+<section class="proof-section" style="padding:88px 0">
+  <div class="wrap">
+    <div class="sh reveal" style="margin-bottom:48px">
+      <span class="t-label en">Client Feedback</span>
+      <span class="t-label fr">Retours clients</span>
+      <h2 class="sh-h2 en">What clients say.</h2>
+      <h2 class="sh-h2 fr">Ce que disent les clients.</h2>
     </div>
+    <div class="proof-grid reveal">
+      <div class="proof-card">
+        <p class="proof-quote en">"Before Flowscale, I had an agent whose entire job was answering the same WhatsApp questions. Now that person focuses on closing deals. The ROI was visible within two weeks."</p>
+        <p class="proof-quote fr">"Avant Flowscale, j'avais un agent dont le seul travail etait de repondre aux memes questions WhatsApp. Maintenant il se concentre sur les closings. Le ROI etait visible en deux semaines."</p>
+        <div class="proof-author">
+          <div class="proof-initials">KD</div>
+          <div>
+            <p class="proof-name">Kofi D.</p>
+            <p class="proof-role"><span class="en">Director, Elite Immo</span><span class="fr">Directeur, Elite Immo</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <p class="proof-quote en">"Our reception team was overwhelmed. The triage system handles bookings and correctly flags urgencies. A critical case was escalated before the patient arrived. That is the system working as intended."</p>
+        <p class="proof-quote fr">"Notre accueil etait submerge. Le systeme gere les reservations et signale les urgences. Un cas critique a ete escalade avant l'arrivee du patient. C'est le systeme qui fonctionne comme prevu."</p>
+        <div class="proof-author">
+          <div class="proof-initials">AM</div>
+          <div>
+            <p class="proof-name">Dr. Adjonou M.</p>
+            <p class="proof-role"><span class="en">Medical Director, Clinique DM</span><span class="fr">Directrice Medicale, Clinique DM</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="proof-card">
+        <p class="proof-quote en">"The email sequence runs in the background while I show properties. The emails read as if I wrote them. I closed three deals I would have lost without the follow-up."</p>
+        <p class="proof-quote fr">"La sequence tourne pendant que je fais des visites. Les emails semblent ecrits par moi. J'ai signe trois deals que j'aurais perdus sans le suivi automatique."</p>
+        <div class="proof-author">
+          <div class="proof-initials">FR</div>
+          <div>
+            <p class="proof-name">Franck R.</p>
+            <p class="proof-role"><span class="en">Agent, FR Immo</span><span class="fr">Agent, FR Immo</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
+
+<!-- STACK -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sh reveal">
+      <span class="t-label en">Technology</span>
+      <span class="t-label fr">Technologies</span>
+      <h2 class="sh-h2 en">Every tool<br/>chosen on merit.</h2>
+      <h2 class="sh-h2 fr">Chaque outil<br/>choisi au merite.</h2>
+      <p class="sh-sub en">No vendor lock-in, no unnecessary subscriptions. Each technology selected because it genuinely outperforms the alternatives for that specific job.</p>
+      <p class="sh-sub fr">Aucun verrouillage proprietaire, aucun abonnement superflu. Chaque technologie choisie parce qu'elle surpasse les alternatives pour ce travail precis.</p>
+    </div>
     <div class="stack-grid reveal">
       <div class="stack-cell">
-        <p class="stack-cat"><span class="en">Orchestration</span><span class="fr">Orchestration</span></p>
-        <div class="stack-item"><div class="stack-dot" style="background:#FF6C37"></div><div><div class="stack-name">n8n</div><div class="stack-desc"><span class="en">Workflow engine</span><span class="fr">Moteur de workflow</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#A855F7"></div><div><div class="stack-name">Make</div><div class="stack-desc"><span class="en">Visual automation</span><span class="fr">Automatisation visuelle</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:var(--dim)"></div><div><div class="stack-name">Webhooks</div><div class="stack-desc"><span class="en">Event triggers</span><span class="fr">Déclencheurs d'événements</span></div></div></div>
+        <p class="stack-cat en">Orchestration</p>
+        <p class="stack-cat fr">Orchestration</p>
+        <div class="stack-row"><div class="s-dot" style="background:#FF6C37"></div><div><div class="s-name">n8n</div><div class="s-desc en">Primary workflow engine</div><div class="s-desc fr">Moteur de workflow principal</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#A855F7"></div><div><div class="s-name">Make</div><div class="s-desc en">Visual automation layer</div><div class="s-desc fr">Automatisation visuelle</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:var(--text-dim)"></div><div><div class="s-name">Webhooks</div><div class="s-desc en">Event-driven triggers</div><div class="s-desc fr">Declencheurs evenements</div></div></div>
       </div>
       <div class="stack-cell">
-        <p class="stack-cat"><span class="en">AI Models</span><span class="fr">Modèles IA</span></p>
-        <div class="stack-item"><div class="stack-dot" style="background:#10A37F"></div><div><div class="stack-name">GPT-4o</div><div class="stack-desc"><span class="en">Reasoning + vision</span><span class="fr">Raisonnement + vision</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#4285F4"></div><div><div class="stack-name">Gemini 2.5</div><div class="stack-desc"><span class="en">Copywriting</span><span class="fr">Rédaction</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#CC785C"></div><div><div class="stack-name">Claude API</div><div class="stack-desc"><span class="en">Complex reasoning</span><span class="fr">Raisonnement complexe</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:var(--dim)"></div><div><div class="stack-name">OpenRouter</div><div class="stack-desc"><span class="en">LLM gateway</span><span class="fr">Passerelle LLM</span></div></div></div>
+        <p class="stack-cat en">AI Models</p>
+        <p class="stack-cat fr">Modeles IA</p>
+        <div class="stack-row"><div class="s-dot" style="background:#10A37F"></div><div><div class="s-name">GPT-4o</div><div class="s-desc en">Reasoning and vision</div><div class="s-desc fr">Raisonnement et vision</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#4285F4"></div><div><div class="s-name">Gemini 2.5</div><div class="s-desc en">Long-form copywriting</div><div class="s-desc fr">Redaction longue</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#CC785C"></div><div><div class="s-name">Claude API</div><div class="s-desc en">Complex reasoning</div><div class="s-desc fr">Raisonnement complexe</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:var(--text-dim)"></div><div><div class="s-name">OpenRouter</div><div class="s-desc en">LLM gateway</div><div class="s-desc fr">Passerelle LLM</div></div></div>
       </div>
       <div class="stack-cell">
-        <p class="stack-cat"><span class="en">Data & Storage</span><span class="fr">Données & Stockage</span></p>
-        <div class="stack-item"><div class="stack-dot" style="background:#1B9C3E"></div><div><div class="stack-name">NocoDB</div><div class="stack-desc"><span class="en">No-code database</span><span class="fr">Base no-code</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#3ECF8E"></div><div><div class="stack-name">Supabase</div><div class="stack-desc"><span class="en">Realtime Postgres</span><span class="fr">Postgres temps réel</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#18BFFF"></div><div><div class="stack-name">Airtable</div><div class="stack-desc"><span class="en">Flexible CRM base</span><span class="fr">Base CRM flexible</span></div></div></div>
+        <p class="stack-cat en">Data &amp; Storage</p>
+        <p class="stack-cat fr">Donnees et stockage</p>
+        <div class="stack-row"><div class="s-dot" style="background:#1B9C3E"></div><div><div class="s-name">NocoDB</div><div class="s-desc en">No-code database</div><div class="s-desc fr">Base de donnees no-code</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#3ECF8E"></div><div><div class="s-name">Supabase</div><div class="s-desc en">Realtime Postgres</div><div class="s-desc fr">Postgres temps reel</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#18BFFF"></div><div><div class="s-name">Airtable</div><div class="s-desc en">Flexible CRM base</div><div class="s-desc fr">Base CRM flexible</div></div></div>
       </div>
       <div class="stack-cell">
-        <p class="stack-cat"><span class="en">Communication & Media</span><span class="fr">Communication & Médias</span></p>
-        <div class="stack-item"><div class="stack-dot" style="background:#25D366"></div><div><div class="stack-name">WhatsApp API</div><div class="stack-desc"><span class="en">Messaging channel</span><span class="fr">Canal de messagerie</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#F6821F"></div><div><div class="stack-name">Cloudinary</div><div class="stack-desc"><span class="en">Public media CDN</span><span class="fr">CDN médias publics</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#EA4335"></div><div><div class="stack-name">Gmail / Sheets</div><div class="stack-desc"><span class="en">Google workspace</span><span class="fr">Suite Google</span></div></div></div>
-        <div class="stack-item"><div class="stack-dot" style="background:#3776AB"></div><div><div class="stack-name">Python</div><div class="stack-desc"><span class="en">Custom scripts</span><span class="fr">Scripts personnalisés</span></div></div></div>
+        <p class="stack-cat en">Communication</p>
+        <p class="stack-cat fr">Communication</p>
+        <div class="stack-row"><div class="s-dot" style="background:#25D366"></div><div><div class="s-name">WhatsApp API</div><div class="s-desc en">WHAPI integration</div><div class="s-desc fr">Integration WHAPI</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#F6821F"></div><div><div class="s-name">Cloudinary</div><div class="s-desc en">Public media CDN</div><div class="s-desc fr">CDN medias publics</div></div></div>
+        <div class="stack-row"><div class="s-dot" style="background:#EA4335"></div><div><div class="s-name">Gmail / Sheets</div><div class="s-desc en">Google Workspace</div><div class="s-desc fr">Suite Google</div></div></div>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════ PROCESS ════════════════════════════════════ -->
-<section id="process">
-  <div class="container">
+<!-- PROCESS -->
+<section id="process" class="process-section">
+  <div class="wrap">
     <div class="sh reveal">
-      <p class="label en">How We Work</p>
-      <p class="label fr">Notre Méthode</p>
-      <h2 class="sh-title en">From idea to<br/>running in production.</h2>
-      <h2 class="sh-title fr">De l'idée au<br/>système en production.</h2>
+      <span class="t-label en">How We Work</span>
+      <span class="t-label fr">Notre methode</span>
+      <h2 class="sh-h2 en">From idea to<br/>production in weeks.</h2>
+      <h2 class="sh-h2 fr">De l'idee a la<br/>production en quelques semaines.</h2>
     </div>
-
-    <div class="process-steps reveal">
-      <div class="p-step">
-        <div class="p-step-top">
-          <div class="p-step-circle active">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <div class="process-grid reveal">
+      <div class="ps">
+        <div class="ps-top">
+          <div class="ps-circle active">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><circle cx="7" cy="7" r="4.5" stroke="white" stroke-width="1.4"/><path d="M7 5v2.5l1.5 1" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
           </div>
-          <span class="p-step-n">01</span>
+          <span class="ps-idx">01</span>
         </div>
-        <p class="p-step-title en">Discovery</p>
-        <p class="p-step-title fr">Découverte</p>
-        <p class="p-step-text en">We map your current process, identify the highest-ROI automation points, and scope the build. Async — no lengthy meetings required.</p>
-        <p class="p-step-text fr">On cartographie votre processus, identifie les points d'automatisation à fort ROI et cadrons le projet. Entièrement async.</p>
+        <p class="ps-title en">Discovery</p>
+        <p class="ps-title fr">Decouverte</p>
+        <p class="ps-text en">We map your current process, identify the highest-ROI automation points, and scope the build. Fully async &mdash; no lengthy calls required.</p>
+        <p class="ps-text fr">On cartographie votre processus, identifie les points a fort ROI et cadre le projet. Entierement async &mdash; sans appels prolonges.</p>
       </div>
-      <div class="p-step">
-        <div class="p-step-top">
-          <div class="p-step-circle">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div class="ps">
+        <div class="ps-top">
+          <div class="ps-circle">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="2.5" y="3" width="9" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 6h4M5 8h2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           </div>
-          <span class="p-step-n">02</span>
+          <span class="ps-idx">02</span>
         </div>
-        <p class="p-step-title en">Architecture</p>
-        <p class="p-step-title fr">Architecture</p>
-        <p class="p-step-text en">Workflow design, API mapping, edge case planning. We document every decision before writing a single node.</p>
-        <p class="p-step-text fr">Design du workflow, mapping des API, planification des cas limites. On documente chaque décision avant d'écrire un seul nœud.</p>
+        <p class="ps-title en">Architecture</p>
+        <p class="ps-title fr">Architecture</p>
+        <p class="ps-text en">Workflow design, API mapping, edge case planning. Every decision documented before a single node is built.</p>
+        <p class="ps-text fr">Design du workflow, mapping des API, cas limites. Chaque decision documentee avant le premier noeud.</p>
       </div>
-      <div class="p-step">
-        <div class="p-step-top">
-          <div class="p-step-circle">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M4 12l3-3 2 2 3-4" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="ps">
+        <div class="ps-top">
+          <div class="ps-circle">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M4 10.5L2 8.5l2-2M10 10.5l2-2-2-2M6.5 12l1-10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <span class="p-step-n">03</span>
+          <span class="ps-idx">03</span>
         </div>
-        <p class="p-step-title en">Build & Test</p>
-        <p class="p-step-title fr">Développement & Tests</p>
-        <p class="p-step-text en">Build, stress-test, then deploy. You get a Loom walkthrough + full documentation so your team owns the system completely.</p>
-        <p class="p-step-text fr">Construction, tests de charge, déploiement. Vous recevez un Loom de présentation et une documentation complète.</p>
+        <p class="ps-title en">Build &amp; Test</p>
+        <p class="ps-title fr">Developpement</p>
+        <p class="ps-text en">Build, stress-test, deploy. You receive a video walkthrough and full documentation so your team owns the system completely.</p>
+        <p class="ps-text fr">Construction, tests de charge, deploiement. Vous recevez un walkthrough video et une documentation complete.</p>
       </div>
-      <div class="p-step">
-        <div class="p-step-top">
-          <div class="p-step-circle">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6 2.7-6 6-6zm0 3v3l2 2" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div class="ps">
+        <div class="ps-top">
+          <div class="ps-circle">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 2C4.24 2 2 4.24 2 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm.5 7.5h-1v-4h1v4zm0-5.5h-1V3h1v1z" fill="currentColor" opacity=".5"/></svg>
           </div>
-          <span class="p-step-n">04</span>
+          <span class="ps-idx">04</span>
         </div>
-        <p class="p-step-title en">Async Support</p>
-        <p class="p-step-title fr">Support Async</p>
-        <p class="p-step-text en">All communication via email, Slack, or WhatsApp. We operate globally — no timezone friction, no retainer required.</p>
-        <p class="p-step-text fr">Toute communication par email, Slack ou WhatsApp. On opère à l'international — aucun problème de fuseau horaire.</p>
+        <p class="ps-title en">Async Support</p>
+        <p class="ps-title fr">Support async</p>
+        <p class="ps-text en">All communication via email, Slack, or WhatsApp. Global operations &mdash; no timezone friction, no retainer required.</p>
+        <p class="ps-text fr">Tout par email, Slack ou WhatsApp. Operations mondiales &mdash; aucun probleme de fuseau horaire, aucun retainer obligatoire.</p>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ════ CONTACT ════════════════════════════════════ -->
-<section id="contact" style="background:var(--faint);border-top:1px solid var(--border)">
-  <div class="container">
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="sh reveal">
+      <span class="t-label en">Investment</span>
+      <span class="t-label fr">Investissement</span>
+      <h2 class="sh-h2 en">Transparent pricing.<br/>No surprises.</h2>
+      <h2 class="sh-h2 fr">Tarifs transparents.<br/>Aucune surprise.</h2>
+      <p class="sh-sub en">One-time project fees. No monthly retainers unless you want them. Every workflow delivered with documentation and a video walkthrough.</p>
+      <p class="sh-sub fr">Frais de projet uniques. Pas de retainer mensuel sauf si vous le souhaitez. Chaque workflow livre avec documentation et video explicative.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <span class="price-tier en">Starter</span>
+        <span class="price-tier fr">Starter</span>
+        <div class="price-amount"><sup>$</sup>500</div>
+        <p class="price-from en">from &mdash; one-time fee</p>
+        <p class="price-from fr">a partir de &mdash; paiement unique</p>
+        <p class="price-desc en">A single automation: one trigger, one action, one integration. Your first system running in under a week.</p>
+        <p class="price-desc fr">Une automatisation unique : un declencheur, une action, une integration. Premier systeme actif en moins d'une semaine.</p>
+        <ul class="price-list">
+          <li class="en">1 workflow</li><li class="fr">1 workflow</li>
+          <li class="en">Up to 3 integrations</li><li class="fr">Jusqu'a 3 integrations</li>
+          <li class="en">Video walkthrough</li><li class="fr">Walkthrough video</li>
+          <li class="en">14-day bug support</li><li class="fr">Support bugs 14 jours</li>
+        </ul>
+        <a href="#contact" class="btn-secondary" style="width:100%;justify-content:center;display:flex">
+          <span class="en">Start here</span><span class="fr">Commencer ici</span>
+        </a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge en">Most popular</div>
+        <div class="price-badge fr">Plus populaire</div>
+        <span class="price-tier en">Growth</span>
+        <span class="price-tier fr">Growth</span>
+        <div class="price-amount" style="color:var(--accent)"><sup>$</sup>1,500</div>
+        <p class="price-from en">from &mdash; one-time fee</p>
+        <p class="price-from fr">a partir de &mdash; paiement unique</p>
+        <p class="price-desc en">A complete autonomous system: multi-step, AI-powered, with persistent memory and CRM integration.</p>
+        <p class="price-desc fr">Un systeme autonome complet : multi-etapes, IA, memoire persistante et integration CRM.</p>
+        <ul class="price-list">
+          <li class="en">1 complete AI workflow</li><li class="fr">1 workflow IA complet</li>
+          <li class="en">AI agent with memory</li><li class="fr">Agent IA avec memoire</li>
+          <li class="en">CRM integration</li><li class="fr">Integration CRM</li>
+          <li class="en">Full documentation</li><li class="fr">Documentation complete</li>
+          <li class="en">30-day support</li><li class="fr">Support 30 jours</li>
+        </ul>
+        <a href="#contact" class="btn-primary" style="width:100%;justify-content:center;display:flex">
+          <span class="en">Get a free audit first</span><span class="fr">Audit gratuit d'abord</span>
+        </a>
+      </div>
+      <div class="price-card">
+        <span class="price-tier en">Scale</span>
+        <span class="price-tier fr">Scale</span>
+        <div class="price-amount"><sup>$</sup>3,500</div>
+        <p class="price-from en">from &mdash; one-time fee</p>
+        <p class="price-from fr">a partir de &mdash; paiement unique</p>
+        <p class="price-desc en">A multi-workflow ecosystem: lead gen, onboarding, nurturing, and ops &mdash; all connected and running as one machine.</p>
+        <p class="price-desc fr">Un ecosysteme multi-workflows : generation de leads, onboarding, nurturing, ops &mdash; tout connecte et fonctionnant ensemble.</p>
+        <ul class="price-list">
+          <li class="en">3 to 5 connected workflows</li><li class="fr">3 a 5 workflows connectes</li>
+          <li class="en">Custom architecture</li><li class="fr">Architecture sur mesure</li>
+          <li class="en">Priority build queue</li><li class="fr">File de priorite</li>
+          <li class="en">Full documentation</li><li class="fr">Documentation complete</li>
+          <li class="en">60-day support</li><li class="fr">Support 60 jours</li>
+        </ul>
+        <a href="#contact" class="btn-secondary" style="width:100%;justify-content:center;display:flex">
+          <span class="en">Discuss scope</span><span class="fr">Parler du perimetre</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section">
+  <div class="wrap">
     <div class="contact-grid reveal">
-      <div class="contact-left">
-        <p class="label" style="margin-bottom:24px"><span class="en">Start a Project</span><span class="fr">Démarrer un Projet</span></p>
-
-        <p class="contact-quote en">
-          "The best automation is the one your team<br/>
-          <em>never has to think about.</em>"
-        </p>
-        <p class="contact-quote fr">
-          "La meilleure automatisation est celle<br/>
-          à laquelle votre équipe <em>ne pense jamais.</em>"
-        </p>
-
-        <div class="contact-attrs">
-          <div class="contact-attr">
-            <div class="contact-attr-icon">
-              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2.5v3l2 2" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <div>
+        <span class="t-label" style="margin-bottom:20px;display:block">
+          <span class="en">Start a project</span>
+          <span class="fr">Demarrer un projet</span>
+        </span>
+        <p class="contact-quote en">"The best automation is the one your team <em>never has to think about.</em>"</p>
+        <p class="contact-quote fr">"La meilleure automatisation est celle a laquelle votre equipe <em>ne pense jamais.</em>"</p>
+        <div class="trust-list">
+          <div class="trust-row">
+            <div class="trust-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><circle cx="6.5" cy="6.5" r="5" stroke="var(--accent)" stroke-width="1.3"/><path d="M4.5 6.5l1.5 1.5 2.5-2.5" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <span class="en">Response within 24 hours via email</span>
-            <span class="fr">Réponse en 24h par email</span>
+            <span class="en">Free audit before any commitment</span>
+            <span class="fr">Audit gratuit avant tout engagement</span>
           </div>
-          <div class="contact-attr">
-            <div class="contact-attr-icon">
-              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M1.5 7a5.5 5.5 0 1 0 11 0 5.5 5.5 0 0 0-11 0zm4-2.5l4 2.5-4 2.5V4.5z" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="trust-row">
+            <div class="trust-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><circle cx="6.5" cy="6.5" r="5" stroke="var(--accent)" stroke-width="1.3"/><path d="M4.5 6.5l1.5 1.5 2.5-2.5" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <span class="en">Free 30-min workflow audit for new clients</span>
-            <span class="fr">Audit workflow gratuit de 30 min pour les nouveaux clients</span>
+            <span class="en">Full documentation delivered with every build</span>
+            <span class="fr">Documentation complete livree a chaque build</span>
           </div>
-          <div class="contact-attr">
-            <div class="contact-attr-icon">
-              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="var(--dim)" stroke-width="1.4"/><path d="M4.5 7h5M7 4.5v5" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="trust-row">
+            <div class="trust-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><circle cx="6.5" cy="6.5" r="5" stroke="var(--accent)" stroke-width="1.3"/><path d="M4.5 6.5l1.5 1.5 2.5-2.5" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <span class="en">English &amp; French — USA, Europe, Africa</span>
-            <span class="fr">Anglais &amp; Français — USA, Europe, Afrique</span>
-          </div>
-          <div class="contact-attr">
-            <div class="contact-attr-icon">
-              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 8.5A1.5 1.5 0 1 0 7 5.5a1.5 1.5 0 0 0 0 3zm0 0v2m-3-6a3 3 0 1 1 6 0" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </div>
-            <span class="en">All communication async — no Zoom required</span>
-            <span class="fr">Toute communication async — sans visioconférence obligatoire</span>
+            <span class="en">Async-first &mdash; no calls, no friction</span>
+            <span class="fr">Async-first &mdash; sans appels, sans friction</span>
           </div>
         </div>
-
-        <div style="padding:20px 22px;background:#111009;border:1px solid var(--border);border-radius:8px">
-          <p class="label" style="margin-bottom:10px"><span class="en">Direct contact</span><span class="fr">Contact direct</span></p>
-          <p style="font-family:var(--mono);font-size:12px;color:var(--paper);margin-bottom:4px">hello@flowscale.agency</p>
-          <p style="font-family:var(--mono);font-size:12px;color:var(--dim)">Upwork: <span style="color:var(--accent)">Sabi G.</span></p>
+        <div class="contact-box">
+          <p>
+            <span>hello@flowscale.io</span><br/>
+            <span class="en">WhatsApp available</span><span class="fr">WhatsApp disponible</span><br/>
+            <span class="en">Response within 24h</span><span class="fr">Reponse sous 24h</span>
+          </p>
         </div>
       </div>
 
-      <div class="contact-right">
-        <form class="form" id="cform" onsubmit="handleSubmit(event)">
-          <div class="form-row">
-            <div class="field">
-              <label><span class="en">Full Name</span><span class="fr">Nom Complet</span></label>
-              <input type="text" name="name" required placeholder="John Smith"/>
+      <div>
+        <div class="step-progress" id="stepProgress">
+          <div class="sp-node current" id="spn1">1</div>
+          <div class="sp-line"></div>
+          <div class="sp-node pending" id="spn2">2</div>
+          <div class="sp-line"></div>
+          <div class="sp-node pending" id="spn3">3</div>
+        </div>
+
+        <div id="formBox">
+          <!-- Step 1 -->
+          <div class="mstep active" id="s1">
+            <p class="step-title en">About your business</p>
+            <p class="step-title fr">Votre entreprise</p>
+            <p class="step-sub en">Tell us what you do and where you are right now.</p>
+            <p class="step-sub fr">Dites-nous ce que vous faites et ou vous en etes.</p>
+            <div class="f2">
+              <div class="field">
+                <label class="en">First name</label>
+                <label class="fr">Prenom</label>
+                <input type="text" id="fname" placeholder="Alex"/>
+              </div>
+              <div class="field">
+                <label class="en">Company</label>
+                <label class="fr">Entreprise</label>
+                <input type="text" id="fcompany" placeholder="Acme Inc."/>
+              </div>
             </div>
-            <div class="field">
-              <label><span class="en">Email</span><span class="fr">Email</span></label>
-              <input type="email" name="email" required placeholder="john@company.com"/>
+            <div class="field" style="margin-bottom:12px">
+              <label class="en">Email</label>
+              <label class="fr">Email</label>
+              <input type="email" id="femail" placeholder="you@company.com"/>
+            </div>
+            <div class="form-nav">
+              <button class="btn-next" onclick="goStep(2)">
+                <span class="en">Continue</span><span class="fr">Continuer</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
           </div>
-          <div class="field">
-            <label><span class="en">Company / Project</span><span class="fr">Entreprise / Projet</span></label>
-            <input type="text" name="company" placeholder="Acme Corp"/>
+
+          <!-- Step 2 -->
+          <div class="mstep" id="s2">
+            <p class="step-title en">What needs automating?</p>
+            <p class="step-title fr">Qu'est-ce qui doit etre automatise ?</p>
+            <p class="step-sub en">Select everything that applies.</p>
+            <p class="step-sub fr">Selectionnez tout ce qui s'applique.</p>
+            <div class="opt-grid">
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Lead qualification</span><span class="fr">Qualification leads</span></button>
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Client onboarding</span><span class="fr">Onboarding clients</span></button>
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Email follow-up</span><span class="fr">Relances email</span></button>
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Appointment booking</span><span class="fr">Prise de RDV</span></button>
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Data reporting</span><span class="fr">Rapports de donnees</span></button>
+              <button class="opt-btn" onclick="this.classList.toggle('selected')"><span class="en">Other</span><span class="fr">Autre</span></button>
+            </div>
+            <div class="form-nav">
+              <button class="btn-back" onclick="goStep(1)"><span class="en">Back</span><span class="fr">Retour</span></button>
+              <button class="btn-next" onclick="goStep(3)">
+                <span class="en">Continue</span><span class="fr">Continuer</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
-          <div class="field">
-            <label><span class="en">Industry</span><span class="fr">Secteur</span></label>
-            <select name="industry">
-              <option value="">— <span class="en">Select</span><span class="fr">Choisir</span> —</option>
-              <option>Real Estate / Immobilier</option>
-              <option>Healthcare / Santé</option>
-              <option>E-Commerce</option>
-              <option>SaaS / Tech</option>
-              <option>Finance</option>
-              <option>Agency / Marketing</option>
-              <option>Other / Autre</option>
-            </select>
+
+          <!-- Step 3 -->
+          <div class="mstep" id="s3">
+            <p class="step-title en">Context &amp; urgency</p>
+            <p class="step-title fr">Contexte et urgence</p>
+            <p class="step-sub en">Describe the problem in your own words.</p>
+            <p class="step-sub fr">Decrivez le probleme avec vos propres mots.</p>
+            <div class="field" style="margin-bottom:12px">
+              <label class="en">Describe the bottleneck</label>
+              <label class="fr">Decrivez le blocage</label>
+              <textarea id="fdesc" placeholder="e.g. We receive 50+ WhatsApp messages daily and respond to each one manually..."></textarea>
+            </div>
+            <div class="field" style="margin-bottom:12px">
+              <label class="en">Timeline</label>
+              <label class="fr">Delai souhaite</label>
+              <select id="ftimeline">
+                <option class="en" value="">Select...</option>
+                <option class="en" value="asap">As soon as possible</option>
+                <option class="en" value="month">Within a month</option>
+                <option class="en" value="quarter">This quarter</option>
+                <option class="en" value="exploring">Just exploring</option>
+                <option class="fr" value="">Choisir...</option>
+                <option class="fr" value="asap">Aussi vite que possible</option>
+                <option class="fr" value="month">Dans le mois</option>
+                <option class="fr" value="quarter">Ce trimestre</option>
+                <option class="fr" value="exploring">Juste en exploration</option>
+              </select>
+            </div>
+            <div class="form-nav">
+              <button class="btn-back" onclick="goStep(2)"><span class="en">Back</span><span class="fr">Retour</span></button>
+              <button class="btn-next" onclick="submitForm()">
+                <span class="en">Send request</span><span class="fr">Envoyer la demande</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
-          <div class="field">
-            <label><span class="en">What do you want to automate?</span><span class="fr">Qu'est-ce que vous voulez automatiser ?</span></label>
-            <textarea name="message" required placeholder="e.g. Our lead qualification takes 3 hours/day and we want AI to handle it…"></textarea>
+        </div>
+
+        <div class="success-box" id="successBox">
+          <div class="s-check">
+            <svg width="22" height="22" fill="none" viewBox="0 0 22 22"><path d="M5 11l4.5 4.5L17 7" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="check-row">
-            <input type="checkbox" name="consent" required id="chk"/>
-            <label for="chk"><span class="en">I agree to be contacted by Flowscale regarding my project.</span><span class="fr">J'accepte d'être contacté par Flowscale concernant mon projet.</span></label>
-          </div>
-          <button type="submit" class="submit-btn" id="sbtn">
-            <span id="sbtxt-en" class="en">Send Message</span>
-            <span id="sbtxt-fr" class="fr">Envoyer le Message</span>
-            <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M2 7.5h11M7.5 2l5.5 5.5-5.5 5.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </form>
-        <div class="success-box" id="sbox">
-          <div class="success-icon">
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--paper)" class="en">Message sent.</p>
-          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--paper)" class="fr">Message envoyé.</p>
-          <p style="font-size:14px;color:var(--dim)" class="en">We'll reply within 24 hours.</p>
-          <p style="font-size:14px;color:var(--dim)" class="fr">Nous répondrons dans les 24 heures.</p>
+          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text)" class="en">Request received.</p>
+          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text)" class="fr">Demande recue.</p>
+          <p style="font-size:13px;color:var(--text-sub)" class="en">We will review your situation and respond within 24 hours with a preliminary audit.</p>
+          <p style="font-size:13px;color:var(--text-sub)" class="fr">Nous examinerons votre situation et repondrons sous 24h avec un audit preliminaire.</p>
         </div>
       </div>
     </div>
@@ -929,30 +1436,30 @@ footer{
 </section>
 
 
-<!-- ════ FOOTER ══════════════════════════════════════ -->
+<!-- FOOTER -->
 <footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:28px;height:28px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <span style="font-weight:800;font-size:14px">Flowscale</span>
-        <span style="font-size:12px;color:var(--dim);font-family:var(--mono)">© 2025</span>
+        <span class="footer-name">Flowscale</span>
+        <span class="footer-copy">&copy; 2026</span>
       </div>
 
-      <div class="footer-status">
-        <div class="status-dot"></div>
-        <span style="font-size:12px;color:var(--dim);font-family:var(--mono)">
-          <span class="en">Available for new projects</span>
-          <span class="fr">Disponible pour de nouveaux projets</span>
-        </span>
+      <div class="availability">
+        <div class="av-dot"></div>
+        <span class="av-text en">Available for new projects</span>
+        <span class="av-text fr">Disponible pour de nouveaux projets</span>
       </div>
 
       <div class="footer-links">
-        <a href="mailto:hello@flowscale.agency">Email</a>
-        <a href="https://upwork.com" target="_blank" rel="noopener">Upwork</a>
-        <a href="#portfolio">Work</a>
+        <a href="#portfolio"><span class="en">Work</span><span class="fr">Projets</span></a>
+        <a href="#pricing"><span class="en">Pricing</span><span class="fr">Tarifs</span></a>
+        <a href="#contact"><span class="en">Contact</span><span class="fr">Contact</span></a>
       </div>
     </div>
   </div>
@@ -960,73 +1467,60 @@ footer{
 
 
 <script>
-/* ── LANGUAGE ─────────────────────────────── */
-function setLang(l){
-  document.body.className='lang-'+l;
-  document.getElementById('btn-en').classList.toggle('on',l==='en');
-  document.getElementById('btn-fr').classList.toggle('on',l==='fr');
-  document.documentElement.lang=l;
+/* THEME */
+function toggleTheme(){
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('fs-theme', next);
 }
+(function(){
+  const saved = localStorage.getItem('fs-theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+})();
 
-/* ── HERO BG PARALLAX ──────────────────────── */
-window.addEventListener('load',()=>{
-  document.getElementById('heroBg').classList.add('loaded');
+/* LANGUAGE */
+function setLang(l){
+  document.body.className = document.body.className.replace(/lang-\w+/,'') + ' lang-' + l;
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.getElementById('btn-fr').classList.toggle('active', l==='fr');
+  localStorage.setItem('fs-lang', l);
+}
+(function(){
+  const saved = localStorage.getItem('fs-lang');
+  if(saved) setLang(saved);
+})();
+
+/* HERO BG */
+window.addEventListener('load', function(){
+  document.getElementById('heroBg').classList.add('ready');
 });
 
-/* ── MARQUEE ───────────────────────────────── */
-const items=[
-  'n8n Workflow Automation','WhatsApp AI Agent','NocoDB Integration',
-  'Medical Triage System','Real Estate Lead Bot','Google Sheets CRM',
-  'Cloudinary Media Bridge','Email Nurturing Sequences','GPT-4o Agents',
-  'Supabase Memory Layer','Async Communication','USA & Global Clients'
-];
-const mq=document.getElementById('mq');
-const full=[...items,...items];
-full.forEach(t=>{
-  const el=document.createElement('div');
-  el.className='marquee-item';
-  el.innerHTML=`<span class="marquee-dot"></span>${t}`;
-  mq.appendChild(el);
-});
+/* SCROLL REVEAL */
+const observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, {threshold:0.08, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
 
-/* ── SCROLL REVEAL ─────────────────────────── */
-const ro=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});
-},{threshold:.1});
-document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
-
-/* ── NAVBAR SCROLL ─────────────────────────── */
-const nav=document.querySelector('nav');
-window.addEventListener('scroll',()=>{
-  nav.style.borderBottomColor=window.scrollY>40?'rgba(42,41,32,.9)':'rgba(42,41,32,.6)';
-});
-
-/* ── CONTACT FORM ──────────────────────────── */
-async function handleSubmit(e){
-  e.preventDefault();
-  const f=e.target,btn=document.getElementById('sbtn');
-  btn.disabled=true;
-  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/><path d="M8 2a6 6 0 0 1 6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" values="0 8 8;360 8 8" dur=".8s" repeatCount="indefinite"/></path></svg> Sending…';
-
-  const data={
-    name:f.name.value,email:f.email.value,
-    company:f.company.value,industry:f.industry.value,
-    message:f.message.value,
-    lang:document.body.classList.contains('lang-fr')?'fr':'en',
-    source:'flowscale-website',
-    timestamp:new Date().toISOString()
-  };
-
-  try{
-    /* ← Replace with your actual n8n webhook URL */
-    await fetch('https://your-n8n-instance.com/webhook/flowscale-contact',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data),mode:'no-cors'
-    });
-  }catch(err){console.log('Webhook attempted',err)}
-
-  document.getElementById('cform').style.display='none';
-  document.getElementById('sbox').style.display='block';
+/* MULTI-STEP FORM */
+function goStep(n){
+  for(var i=1;i<=3;i++){
+    var s = document.getElementById('s'+i);
+    var node = document.getElementById('spn'+i);
+    s.classList.toggle('active', i===n);
+    node.classList.remove('done','current','pending');
+    if(i < n) node.classList.add('done');
+    else if(i === n) node.classList.add('current');
+    else node.classList.add('pending');
+  }
+}
+function submitForm(){
+  document.getElementById('formBox').style.display = 'none';
+  document.getElementById('stepProgress').style.display = 'none';
+  var sb = document.getElementById('successBox');
+  sb.style.display = 'block';
 }
 </script>
 </body>
