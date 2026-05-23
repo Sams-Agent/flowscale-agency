@@ -1,390 +1,765 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flowscale — High-Performance AI & Automation Architecture</title>
+<title>Flowscale Agency — AI Automation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
 <script>
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { 
-          sans: ['Plus Jakarta Sans', 'sans-serif'], 
-          mono: ['Geist Mono', 'monospace'] 
-        },
+        fontFamily: { inter: ['Inter','sans-serif'], mono: ['DM Mono','monospace'] },
         colors: {
-          slate0: '#030303', // Vrai noir chirurgical
-          slate1: '#09090b', // Cartes premium
-          slate2: '#141417', 
-          border: 'rgba(39, 39, 42, 0.5)', // Bordures fines discrètes
-          borderhi: 'rgba(63, 63, 70, 0.8)',
-          accent: '#06b6d4', // Cyan électrique minimaliste
-          textMuted: '#a1a1aa'
+          bg0:'#030507', bg1:'#070B10', bg2:'#0D1117', bg3:'#111720',
+          border:'#1C2A38', borderhi:'#2A3D52',
+          cyan:'#22D3EE', cyanlo:'#0891B2', cyandim:'#0E4A5C',
+          blue:'#3B82F6', bluedim:'#1E3A5F',
+          text1:'#F1F5F9', text2:'#94A3B8', text3:'#4B6580',
+          green:'#10B981', greenlo:'#064E3B',
+          amber:'#F59E0B', amberlo:'#451A03',
+        },
+        animation: {
+          'fade-up':'fadeUp .6s ease forwards',
+          'fade-in':'fadeIn .5s ease forwards',
+          'pulse-slow':'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
+        },
+        keyframes: {
+          fadeUp:{ '0%':{opacity:'0',transform:'translateY(24px)'},'100%':{opacity:'1',transform:'translateY(0)'} },
+          fadeIn:{ '0%':{opacity:'0'},'100%':{opacity:'1'} },
         }
       }
     }
   }
 </script>
 <style>
-  body { background-color: #030303; font-family: 'Plus Jakarta Sans', sans-serif; }
-  .lang-fr .trans-en { display: none !important; }
-  .lang-en .trans-fr { display: none !important; }
-  
-  /* Lignes de grille subtiles pour le reste du site */
-  .grid-bg {
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  
-  /* Masque d'obscurcissement pour l'image de fond du Héro */
-  .hero-overlay {
-    background-color: rgba(3, 3, 3, 0.7); /* Masque noir à 70% */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',sans-serif;background:#030507;color:#F1F5F9;overflow-x:hidden}
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:#070B10}
+  ::-webkit-scrollbar-thumb{background:#1C2A38;border-radius:99px}
+  ::-webkit-scrollbar-thumb:hover{background:#2A3D52}
+
+  /* Noise overlay */
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+  /* Grid accent */
+  .grid-bg{background-image:linear-gradient(rgba(34,211,238,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.035) 1px,transparent 1px);background-size:48px 48px}
+
+  .glow-cyan{box-shadow:0 0 40px rgba(34,211,238,.12),0 0 80px rgba(34,211,238,.06)}
+  .glow-line{box-shadow:0 1px 0 0 rgba(34,211,238,.3)}
+
+  .card{background:#0D1117;border:1px solid #1C2A38;border-radius:16px;transition:border-color .25s,box-shadow .25s}
+  .card:hover{border-color:#2A3D52;box-shadow:0 0 32px rgba(34,211,238,.08)}
+
+  .tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+  .tag-cyan{background:rgba(34,211,238,.1);color:#22D3EE;border:1px solid rgba(34,211,238,.2)}
+  .tag-blue{background:rgba(59,130,246,.1);color:#60A5FA;border:1px solid rgba(59,130,246,.2)}
+  .tag-green{background:rgba(16,185,129,.1);color:#34D399;border:1px solid rgba(16,185,129,.2)}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,#0891B2,#22D3EE);color:#030507;font-weight:600;font-size:14px;border-radius:10px;border:none;cursor:pointer;transition:opacity .2s,transform .15s}
+  .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+  .btn-primary:active{transform:translateY(0)}
+
+  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;color:#94A3B8;font-weight:500;font-size:14px;border-radius:10px;border:1px solid #1C2A38;cursor:pointer;transition:all .2s}
+  .btn-ghost:hover{border-color:#2A3D52;color:#F1F5F9;background:#0D1117}
+
+  .lang-btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid #1C2A38}
+  .lang-btn.active{background:rgba(34,211,238,.12);color:#22D3EE;border-color:rgba(34,211,238,.3)}
+  .lang-btn:not(.active){background:transparent;color:#4B6580}
+  .lang-btn:not(.active):hover{color:#94A3B8;border-color:#2A3D52}
+
+  .input-field{width:100%;background:#0D1117;border:1px solid #1C2A38;border-radius:10px;padding:12px 16px;color:#F1F5F9;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .input-field::placeholder{color:#4B6580}
+  .input-field:focus{border-color:rgba(34,211,238,.4);box-shadow:0 0 0 3px rgba(34,211,238,.08)}
+
+  .section-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#0891B2}
+
+  .step-num{width:28px;height:28px;border-radius:50%;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#22D3EE;flex-shrink:0}
+
+  /* Language toggling */
+  .en, .fr { transition: opacity .2s }
+  body.lang-fr .en { display: none !important }
+  body.lang-en .fr { display: none !important }
+
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+
+  /* Animated border on hero card */
+  @keyframes borderFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .hero-card-border{position:relative}
+  .hero-card-border::before{content:'';position:absolute;inset:-1px;border-radius:17px;background:linear-gradient(90deg,#22D3EE22,#3B82F622,#22D3EE22);background-size:200%;animation:borderFlow 4s linear infinite;z-index:-1}
+
+  .tech-pill{display:flex;align-items:center;gap:10px;padding:14px 18px;background:#0D1117;border:1px solid #1C2A38;border-radius:12px;transition:all .2s}
+  .tech-pill:hover{border-color:#2A3D52;background:#111720;transform:translateY(-2px)}
+
+  /* Mobile nav */
+  @media(max-width:768px){
+    .nav-links{display:none}
   }
 </style>
 </head>
-<body class="lang-en text-zinc-300 antialiased selection:bg-zinc-800 selection:text-white relative">
+<body class="lang-en">
 
-  <nav class="sticky top-0 z-50 border-b border-border bg-slate0/80 backdrop-blur-md transition-all duration-300">
-    <div class="mx-auto max-w-6xl px-6">
-      <div class="flex h-20 items-center justify-between">
-        
-        <div class="flex items-center gap-2.5 group">
-          <div class="h-5 w-5 rounded-sm border border-white/20 flex items-center justify-center bg-zinc-900">
-            <div class="h-1.5 w-1.5 bg-white rounded-full"></div>
-          </div>
-          <span class="text-sm font-semibold tracking-wider text-white font-mono uppercase">Flowscale</span>
+<!-- ═══════════════════════════ NAV ═══════════════════════════ -->
+<nav id="navbar" style="position:fixed;top:0;left:0;right:0;z-index:50;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(3,5,7,.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(28,42,56,.6);transition:all .3s">
+  <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0891B2,#22D3EE);display:flex;align-items:center;justify-content:center">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 2 10 2-5 1 0" stroke="#030507" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="8" r="1.5" fill="#030507"/></svg>
+    </div>
+    <span style="font-weight:700;font-size:15px;color:#F1F5F9;letter-spacing:-.02em">Flowscale<span style="color:#22D3EE">.</span></span>
+  </a>
+
+  <div class="nav-links" style="display:flex;align-items:center;gap:32px">
+    <a href="#portfolio" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Portfolio</span><span class="fr">Réalisations</span></a>
+    <a href="#stack" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Tech Stack</span><span class="fr">Technologies</span></a>
+    <a href="#contact" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Contact</span><span class="fr">Contact</span></a>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="grid-bg" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;position:relative;overflow:hidden">
+
+  <!-- Radial glow -->
+  <div style="position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(34,211,238,.08) 0%,transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:0;left:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(59,130,246,.06) 0%,transparent 70%);pointer-events:none"></div>
+
+  <div style="max-width:800px;text-align:center;position:relative;z-index:1">
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);border-radius:99px;margin-bottom:28px">
+      <div style="width:6px;height:6px;border-radius:50%;background:#22D3EE;animation:pulse 2s infinite"></div>
+      <span class="en" style="font-size:12px;font-weight:500;color:#22D3EE;letter-spacing:.04em">AI AUTOMATION AGENCY</span>
+      <span class="fr" style="font-size:12px;font-weight:500;color:#22D3EE;letter-spacing:.04em">AGENCE D'AUTOMATISATION IA</span>
+    </div>
+
+    <h1 class="en" style="font-size:clamp(38px,6vw,72px);font-weight:700;line-height:1.08;letter-spacing:-.04em;margin-bottom:24px">
+      Scale your business<br/>
+      <span style="background:linear-gradient(90deg,#22D3EE,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">with AI & n8n automation</span>
+    </h1>
+    <h1 class="fr" style="font-size:clamp(34px,5.5vw,68px);font-weight:700;line-height:1.08;letter-spacing:-.04em;margin-bottom:24px">
+      Faites évoluer votre activité<br/>
+      <span style="background:linear-gradient(90deg,#22D3EE,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">grâce à l'IA et l'automatisation n8n</span>
+    </h1>
+
+    <p class="en" style="font-size:18px;color:#94A3B8;line-height:1.65;max-width:580px;margin:0 auto 40px">We design intelligent workflows that replace repetitive tasks, qualify leads 24/7, and connect your entire stack — without a single line of manual code.</p>
+    <p class="fr" style="font-size:18px;color:#94A3B8;line-height:1.65;max-width:580px;margin:0 auto 40px">Nous concevons des workflows intelligents qui remplacent les tâches répétitives, qualifient vos leads 24h/24 et connectent tout votre stack — sans aucune ligne de code manuel.</p>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
+      <a href="#portfolio" class="btn-primary">
+        <span class="en">See case studies</span>
+        <span class="fr">Voir les projets</span>
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#contact" class="btn-ghost">
+        <span class="en">Get a free audit</span>
+        <span class="fr">Audit gratuit</span>
+      </a>
+    </div>
+
+    <!-- Mini stats -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:40px;margin-top:64px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">3+</div>
+        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Industries Automated</span><span class="fr">Secteurs Automatisés</span></div>
+      </div>
+      <div style="width:1px;height:40px;background:#1C2A38"></div>
+      <div style="text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">95%</div>
+        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Tasks Eliminated</span><span class="fr">Tâches Éliminées</span></div>
+      </div>
+      <div style="width:1px;height:40px;background:#1C2A38"></div>
+      <div style="text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">24/7</div>
+        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">AI Always On</span><span class="fr">IA Disponible</span></div>
+      </div>
+      <div style="width:1px;height:40px;background:#1C2A38"></div>
+      <div style="text-align:center">
+        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">$0</div>
+        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Manual Dev Cost</span><span class="fr">Coût Dev Manuel</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ PORTFOLIO ═══════════════════════════ -->
+<section id="portfolio" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+  <div class="reveal" style="text-align:center;margin-bottom:64px">
+    <div class="section-label" style="margin-bottom:12px"><span class="en">Case Studies</span><span class="fr">Études de Cas</span></div>
+    <h2 class="en" style="font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.04em;margin-bottom:16px">Real workflows.<br/><span style="color:#4B6580">Real results.</span></h2>
+    <h2 class="fr" style="font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.04em;margin-bottom:16px">Des workflows réels.<br/><span style="color:#4B6580">Des résultats concrets.</span></h2>
+    <p class="en" style="color:#4B6580;font-size:16px;max-width:500px;margin:0 auto">Three production systems, deployed and operational. Each built from a real client problem.</p>
+    <p class="fr" style="color:#4B6580;font-size:16px;max-width:500px;margin:0 auto">Trois systèmes en production, déployés et opérationnels. Chacun construit à partir d'un vrai problème client.</p>
+  </div>
+
+  <!-- CASE 1 — Real Estate -->
+  <div class="card reveal" style="padding:0;margin-bottom:24px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
+      <!-- Left: info -->
+      <div style="padding:40px 40px 40px;border-right:1px solid #1C2A38">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+          <span class="tag tag-cyan">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+            <span class="en">Real Estate</span><span class="fr">Immobilier</span>
+          </span>
+          <span class="tag tag-blue">WhatsApp · NocoDB · Cloudinary</span>
         </div>
-        
-        <div class="flex items-center gap-8">
-          <div class="hidden md:flex items-center gap-8 text-xs font-mono tracking-widest uppercase">
-            <a href="#projects" class="text-textMuted hover:text-white transition-colors">
-              <span class="trans-en">Case Studies</span><span class="trans-fr">Études de Cas</span>
-            </a>
-            <a href="#stack" class="text-textMuted hover:text-white transition-colors">Stack</a>
+
+        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">AI Real Estate<br/>Lead Qualification Agent</h3>
+        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Agent IA de Qualification<br/>de Leads Immobiliers</h3>
+
+        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Elite Immo · WhatsApp Bot · Lead Gen</p>
+        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Elite Immo · Bot WhatsApp · Génération de leads</p>
+
+        <!-- Problem -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
+          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">Real estate agents spent hours manually answering the same WhatsApp questions: price, location, availability. High-intent leads were lost overnight when agents were offline, and there was no systematic way to capture prospect data.</p>
+          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">Les agents immobiliers passaient des heures à répondre manuellement aux mêmes questions WhatsApp. Les leads à forte intention étaient perdus la nuit, et il n'existait aucun moyen systématique de capturer les données des prospects.</p>
+        </div>
+      </div>
+
+      <!-- Right: solution + result -->
+      <div style="padding:40px">
+        <div style="margin-bottom:24px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">1</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Webhook Receiver:</strong> Captures every incoming WhatsApp message (text, audio, image) via WHAPI webhook and routes it through message-type detection.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Webhook:</strong> Capture chaque message WhatsApp entrant (texte, audio, image) via le webhook WHAPI avec détection du type de média.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">2</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">AI Agent + NocoDB:</strong> GPT-4o collects 3 criteria (type, zone, budget) then calls the NocoDB catalog API to find matching properties in real time. Zero hallucination — only real listings.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Agent IA + NocoDB:</strong> GPT-4o collecte 3 critères (type, zone, budget) puis interroge l'API NocoDB pour trouver des biens en temps réel. Zéro hallucination.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">3</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Cloudinary Bridge:</strong> Private S3 NocoDB images are downloaded via authenticated API, then re-uploaded to Cloudinary to generate a public URL — enabling WhatsApp image delivery.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Bridge Cloudinary:</strong> Les images S3 privées NocoDB sont téléchargées via API authentifiée, puis transférées vers Cloudinary pour générer une URL publique.</p>
+            </div>
           </div>
-          
-          <div class="h-4 w-[1px] bg-zinc-800 hidden md:block"></div>
+        </div>
 
-          <button id="langToggle" class="flex items-center gap-2 rounded-full border border-border bg-zinc-900/50 px-3 py-1.5 text-xs font-mono font-medium text-textMuted hover:text-white transition-all cursor-pointer">
-            <span class="text-[10px] opacity-40">●</span>
-            <span class="trans-en">FR</span><span class="trans-fr">EN</span>
-          </button>
-
-          <a href="#contact" class="rounded-full bg-white px-5 py-2 text-xs font-medium text-black hover:bg-zinc-200 transition-all shadow-sm">
-            <span class="trans-en">Initiate Project</span><span class="trans-fr">Lancer un Projet</span>
-          </a>
+        <!-- Result -->
+        <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:12px;padding:20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#10B981;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
+          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">Fully automated lead qualification 24/7. Prospects receive property photos, descriptions, and pricing in under 3 seconds. All qualified leads are auto-logged to Google Sheets. <strong style="color:#34D399">Agent response time: &lt; 3s. Zero human effort per lead.</strong></p>
+          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">Qualification automatique des leads 24h/24. Les prospects reçoivent photos, descriptions et prix en moins de 3 secondes. Tous les leads qualifiés sont enregistrés automatiquement dans Google Sheets. <strong style="color:#34D399">Temps de réponse : &lt; 3s. Zéro effort humain par lead.</strong></p>
         </div>
       </div>
     </div>
-  </nav>
+  </div>
 
-  <section class="relative pt-28 pb-24 border-b border-border bg-cover bg-center overflow-hidden" style="background-image: url('https://img.freepik.com/free-photo/young-adult-uses-smartphone-modern-workspace-setting_23-2151608670.jpg');">
-    <div class="absolute inset-0 hero-overlay z-0"></div>
-    
-    <div class="relative mx-auto max-w-5xl px-6 text-center z-10">
-      
-      <div data-aos="fade-down" class="inline-flex items-center gap-2 rounded-full border border-border bg-zinc-900/80 px-4 py-1.5 text-[11px] font-mono tracking-wider text-textMuted mb-8">
-        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="trans-en">Asynchronous Development Model</span>
-        <span class="trans-fr">Modèle de Développement Asynchrone</span>
-      </div>
-
-      <h1 data-aos="fade-up" data-aos-delay="100" class="text-4xl font-normal tracking-tight text-white sm:text-6xl lg:text-7xl max-w-4xl mx-auto font-sans leading-[1.05]">
-        <span class="trans-en">Engineered scaling via autonomous <span class="text-cyan-400">n8n architectures.</span></span>
-        <span class="trans-fr">Architectures <span class="text-cyan-400">n8n de pointe</span> pour entreprises en croissance.</span>
-      </h1>
-
-      <p data-aos="fade-up" data-aos-delay="200" class="mx-auto mt-8 max-w-2xl text-sm md:text-base text-zinc-100 leading-relaxed font-sans">
-        <span class="trans-en">We replace unreliable standard integrations with industrial-grade data pipelines. Custom components built for enterprise operations. Managed 100% via written protocols.</span>
-        <span class="trans-fr">Nous remplaçons les intégrations fragiles par des pipelines de données industriels. Des composants sur mesure pour vos opérations. Gestion exclusive par protocoles écrits.</span>
-      </p>
-
-      <div data-aos="fade-up" data-aos-delay="300" class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="#contact" class="w-full sm:w-auto rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-7 py-3.5 text-xs font-mono tracking-widest uppercase text-white transition-all text-center shadow-lg">
-          <span class="trans-en">Request Engineering Brief</span><span class="trans-fr">Demander un Brief Technique</span>
-        </a>
-      </div>
-
-    </div>
-  </section>
-
-  <div class="fixed inset-0 grid-bg -z-50 pointer-events-none"></div>
-
-  <section class="border-b border-border bg-zinc-950/20 py-16">
-    <div class="mx-auto max-w-5xl px-6">
-      <div class="grid grid-cols-1 gap-12 sm:grid-cols-3 text-left font-mono">
-        <div data-aos="fade-up" data-aos-delay="50">
-          <div class="text-xs text-textMuted uppercase tracking-widest">System Availability</div>
-          <div class="text-2xl font-medium text-white mt-2">24 / 7 / 365</div>
+  <!-- CASE 2 — Healthcare -->
+  <div class="card reveal" style="padding:0;margin-bottom:24px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
+      <div style="padding:40px;border-right:1px solid #1C2A38">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+          <span class="tag tag-blue">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+            <span class="en">Healthcare</span><span class="fr">Santé</span>
+          </span>
+          <span class="tag tag-cyan">Supabase · Google Calendar · OpenRouter</span>
         </div>
-        <div data-aos="fade-up" data-aos-delay="150" class="sm:border-l sm:border-border sm:pl-12">
-          <div class="text-xs text-textMuted uppercase tracking-widest">Admin Human Latency</div>
-          <div class="text-2xl font-medium text-cyan-400 mt-2">-80.4%</div>
-        </div>
-        <div data-aos="fade-up" data-aos-delay="250" class="sm:border-l sm:border-border sm:pl-12">
-          <div class="text-xs text-textMuted uppercase tracking-widest">Communication Channel</div>
-          <div class="text-2xl font-medium text-white mt-2">100% Written</div>
+
+        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Clinical WhatsApp<br/>Appointment Assistant</h3>
+        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Assistant IA Clinique<br/>sur WhatsApp</h3>
+
+        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Clinique Divine Miséricorde · Medical Triage · Smart Scheduling</p>
+        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Clinique Divine Miséricorde · Triage Médical · Planning Intelligent</p>
+
+        <div style="margin-bottom:0">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
+          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">The clinic's reception team was overwhelmed with WhatsApp booking messages — many arriving outside business hours. Symptom assessment was inconsistent, appointment reminders were manual, and there was no patient conversation history across sessions.</p>
+          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">L'équipe de la clinique était débordée par les messages WhatsApp — souvent en dehors des heures d'ouverture. L'évaluation des symptômes était incohérente, les rappels manuels, et il n'existait aucun historique des conversations par patient.</p>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section id="projects" class="py-28 border-b border-border">
-    <div class="mx-auto max-w-6xl px-6">
-      
-      <div data-aos="fade-right" class="max-w-2xl mb-20">
-        <span class="text-xs font-mono tracking-widest text-textMuted uppercase">Verified Ledger</span>
-        <h2 class="text-3xl font-normal tracking-tight text-white mt-3 sm:text-4xl">
-          <span class="trans-en">Production Deployments</span>
-          <span class="trans-fr">Déploiements en Production</span>
-        </h2>
-      </div>
+      <div style="padding:40px">
+        <div style="margin-bottom:24px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
 
-      <div class="grid gap-8 md:grid-cols-3">
-        
-        <div data-aos="fade-up" data-aos-delay="100" class="flex flex-col justify-between border border-border bg-slate1 p-8 rounded-none hover:border-zinc-700 transition-all duration-300 relative overflow-hidden">
-          <div>
-            <div class="flex items-center justify-between mb-8 font-mono text-[11px]">
-              <span class="text-white tracking-wider uppercase">[ Architecture 01 ]</span>
-              <span class="text-textMuted">NocoDB // Cloud API</span>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">1</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Persistent Memory (Supabase):</strong> Every conversation is stored with a patient profile. New vs. returning patients are detected automatically — eliminating "who are you?" questions.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Mémoire persistante (Supabase):</strong> Chaque conversation est stockée avec un profil patient. Les nouveaux vs anciens patients sont détectés automatiquement.</p>
             </div>
-            <h3 class="text-lg font-medium text-white tracking-tight">
-              <span class="trans-en">Lead Triaging & Data Ingestion</span>
-              <span class="trans-fr">Qualification & Ingestion de Données</span>
-            </h3>
-            <p class="mt-4 text-xs text-textMuted leading-relaxed font-sans">
-              <span class="trans-en">Automated real estate qualification engine routing unstructured metadata payloads, managing CDN media assets via Cloudinary, and mapping schemas instantly.</span>
-              <span class="trans-fr">Moteur de qualification immobilière traitant les métadonnées brutes, gérant les médias sur Cloudinary et synchronisant les schémas de données.</span>
-            </p>
-            <div class="mt-8 space-y-4 border-t border-zinc-900 pt-6 text-[12px]">
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-white">Legacy Friction</span>
-                <span class="text-textMuted mt-1 block"><span class="trans-en">Manual high-latency qualification over chat channels.</span><span class="trans-fr">Saisie manuelle et lente des demandes via canaux messagerie.</span></span>
-              </div>
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-cyan-400">Target Stack</span>
-                <span class="text-textMuted mt-1 block">Webhook Routers & JSON Mutation Nodes.</span>
-              </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">2</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Medical Triage Engine:</strong> AI asks 3–4 adaptive symptom questions, scores urgency (low → urgent), logs to Supabase triage_cases, and alerts medical staff for high/urgent cases in real time.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Moteur de Triage Médical:</strong> L'IA pose 3–4 questions adaptées, évalue l'urgence (faible → urgente), enregistre dans Supabase et alerte le personnel médical en temps réel.</p>
             </div>
-          </div>
-          <div class="mt-8 pt-6 border-t border-zinc-900 font-mono text-[11px] text-white">
-            // <span class="trans-en">Autonomous Qualification</span><span class="trans-fr">Qualification Autonome</span>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">3</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Smart Scheduler + Reminders:</strong> Google Calendar integration checks real availability, proposes 3 free slots, confirms instantly. A cron job sends WhatsApp reminders 30 min before each appointment.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Planificateur + Rappels:</strong> Intégration Google Calendar pour vérifier les disponibilités, proposer 3 créneaux libres, confirmer instantanément. Un cron envoie les rappels WhatsApp 30 min avant chaque RDV.</p>
+            </div>
           </div>
         </div>
 
-        <div data-aos="fade-up" data-aos-delay="200" class="flex flex-col justify-between border border-border bg-slate1 p-8 rounded-none hover:border-zinc-700 transition-all duration-300 relative overflow-hidden">
-          <div>
-            <div class="flex items-center justify-between mb-8 font-mono text-[11px]">
-              <span class="text-white tracking-wider uppercase">[ Architecture 02 ]</span>
-              <span class="text-textMuted">Healthcare API</span>
-            </div>
-            <h3 class="text-lg font-medium text-white tracking-tight">
-              <span class="trans-en">Asynchronous Medical Secretariat</span>
-              <span class="trans-fr">Secrétariat Médical Asynchrone</span>
-            </h3>
-            <p class="mt-4 text-xs text-textMuted leading-relaxed font-sans">
-              <span class="trans-en">Pre-consultation clinical filtering tree and automated agenda scheduling engine operating via validation layer endpoints.</span>
-              <span class="trans-fr">Arbre de filtrage clinique pré-consultation et moteur de planification d'agenda connecté directement aux endpoints sécurisés.</span>
-            </p>
-            <div class="mt-8 space-y-4 border-t border-zinc-900 pt-6 text-[12px]">
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-white">Legacy Friction</span>
-                <span class="text-textMuted mt-1 block"><span class="trans-en">Saturated administrative desks handling structured intake text.</span><span class="trans-fr">Secrétariat surchargé par le recueil d'informations basiques.</span></span>
-              </div>
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-cyan-400">Target Stack</span>
-                <span class="text-textMuted mt-1 block">Bilingual Conditional Logical Arrays.</span>
-              </div>
-            </div>
-          </div>
-          <div class="mt-8 pt-6 border-t border-zinc-900 font-mono text-[11px] text-white">
-            // <span class="trans-en">Zero Admin Intervention</span><span class="trans-fr">Zéro Intervention Humaine</span>
-          </div>
+        <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:12px;padding:20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#60A5FA;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
+          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">Reception team workload cut by ~80%. Critical symptom cases are triaged and escalated before the patient even arrives. Appointment no-shows dropped significantly thanks to automated 30-min WhatsApp reminders. <strong style="color:#93C5FD">Full booking loop completed in under 2 minutes.</strong></p>
+          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">Charge de travail de l'accueil réduite de ~80%. Les cas critiques sont triés avant même l'arrivée du patient. Les rendez-vous manqués ont chuté grâce aux rappels WhatsApp automatiques. <strong style="color:#93C5FD">Cycle de réservation complet en moins de 2 minutes.</strong></p>
         </div>
-
-        <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col justify-between border border-border bg-slate1 p-8 rounded-none hover:border-zinc-700 transition-all duration-300 relative overflow-hidden">
-          <div>
-            <div class="flex items-center justify-between mb-8 font-mono text-[11px]">
-              <span class="text-white tracking-wider uppercase">[ Architecture 03 ]</span>
-              <span class="text-textMuted">Python // Router</span>
-            </div>
-            <h3 class="text-lg font-medium text-white tracking-tight">
-              <span class="trans-en">Pipeline Nurturing Automation</span>
-              <span class="trans-fr">Automatisation du Pipeline CRM</span>
-            </h3>
-            <p class="mt-4 text-xs text-textMuted leading-relaxed font-sans">
-              <span class="trans-en">State-machine event listener analyzing pipeline engagement in real-time, rewriting data structures using custom Python logic.</span>
-              <span class="trans-fr">Écouteur d'événements en temps réel analysant l'engagement commerciale et reformatant la donnée via scripts Python natifs.</span>
-            </p>
-            <div class="mt-8 space-y-4 border-t border-zinc-900 pt-6 text-[12px]">
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-white">Legacy Friction</span>
-                <span class="text-textMuted mt-1 block"><span class="trans-en">Lead drop-offs caused by asynchronous human tracking errors.</span><span class="trans-fr">Perte de vélocité commerciale due aux oublis de relance.</span></span>
-              </div>
-              <div>
-                <span class="block font-mono text-[10px] uppercase tracking-wider text-cyan-400">Target Stack</span>
-                <span class="text-textMuted mt-1 block">Python Data Shaping & High-Speed CRM Triggers.</span>
-              </div>
-            </div>
-          </div>
-          <div class="mt-8 pt-6 border-t border-zinc-900 font-mono text-[11px] text-white">
-            // <span class="trans-en">High Conversion Velocity</span><span class="trans-fr">Vélocité Commerciale Accrue</span>
-          </div>
-        </div>
-
       </div>
     </div>
-  </section>
+  </div>
 
-  <section id="stack" class="py-24 border-b border-border bg-zinc-950/40">
-    <div class="mx-auto max-w-5xl px-6">
-      <div class="grid gap-16 lg:grid-cols-5 items-start">
-        
-        <div data-aos="fade-right" class="lg:col-span-2">
-          <span class="text-xs font-mono tracking-widest text-textMuted uppercase">Core Stack</span>
-          <h2 class="text-2xl font-normal text-white tracking-tight mt-3">
-            <span class="trans-en">No wrappers. No unstable layers. Only pure architecture.</span>
-            <span class="trans-fr">Pas d'intermédiaires fragiles. Uniquement de l'architecture pure.</span>
-          </h2>
-        </div>
-        
-        <div data-aos="fade-left" class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono text-xs">
-          <div class="border border-border p-6 bg-slate0">
-            <span class="text-white block font-medium">[ n8n Advanced ]</span>
-            <span class="text-textMuted mt-2 block font-sans">Multi-stage operational router trees.</span>
-          </div>
-          <div class="border border-border p-6 bg-slate0">
-            <span class="text-white block font-medium">[ Native Python ]</span>
-            <span class="text-textMuted mt-2 block font-sans">Bespoke data manipulation algorithms.</span>
-          </div>
-          <div class="border border-border p-6 bg-slate0">
-            <span class="text-white block font-medium">[ Schema Design ]</span>
-            <span class="text-textMuted mt-2 block font-sans">Relational structure deployment on Airtable & NocoDB.</span>
-          </div>
-          <div class="border border-border p-6 bg-slate0">
-            <span class="text-white block font-medium">[ Endpoint Routing ]</span>
-            <span class="text-textMuted mt-2 block font-sans">Direct integration with WhatsApp Cloud Enterprise API.</span>
-          </div>
+  <!-- CASE 3 — CRM Nurturing -->
+  <div class="card reveal" style="padding:0;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
+      <div style="padding:40px;border-right:1px solid #1C2A38">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+          <span class="tag tag-green">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+            <span class="en">CRM / Sales</span><span class="fr">CRM / Ventes</span>
+          </span>
+          <span class="tag tag-cyan">Tally · Gemini · Google Sheets</span>
         </div>
 
-      </div>
-    </div>
-  </section>
+        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Automated Prospect<br/>Nurturing Sequence</h3>
+        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Séquence Automatisée<br/>de Suivi Prospects</h3>
 
-  <section id="contact" class="py-28 relative">
-    <div class="mx-auto max-w-2xl px-6 text-center">
-      <span class="text-xs font-mono tracking-widest text-textMuted uppercase">Inbound Channel</span>
-      <h2 data-aos="fade-up" class="text-3xl font-normal tracking-tight text-white mt-3">
-        <span class="trans-en">Submit Technical Brief</span>
-        <span class="trans-fr">Soumettre un Brief Technique</span>
-      </h2>
-      
-      <form data-aos="fade-up" data-aos-delay="100" id="contactForm" class="mt-12 text-left space-y-6 border border-border bg-slate1 p-8 sm:p-10 rounded-none backdrop-blur-sm">
-        <div class="grid gap-6 sm:grid-cols-2">
-          <div>
-            <label class="block font-mono text-[10px] uppercase tracking-wider text-textMuted">Identity</label>
-            <input type="text" name="name" required class="mt-2 w-full border-b border-border bg-transparent py-2 text-sm text-white focus:border-white focus:outline-none placeholder:text-zinc-700" placeholder="e.g. Alexander Wright">
-          </div>
-          <div>
-            <label class="block font-mono text-[10px] uppercase tracking-wider text-textMuted">Secure Email</label>
-            <input type="email" name="email" required class="mt-2 w-full border-b border-border bg-transparent py-2 text-sm text-white focus:border-white focus:outline-none placeholder:text-zinc-700" placeholder="e.g. alex@enterprise.com">
-          </div>
-        </div>
-        <div class="grid gap-6 sm:grid-cols-2">
-          <div>
-            <label class="block font-mono text-[10px] uppercase tracking-wider text-textMuted">Organization</label>
-            <input type="text" name="company" class="mt-2 w-full border-b border-border bg-transparent py-2 text-sm text-white focus:border-white focus:outline-none placeholder:text-zinc-700" placeholder="e.g. Nexus Labs">
-          </div>
-          <div>
-            <label class="block font-mono text-[10px] uppercase tracking-wider text-textMuted">Domain Sector</label>
-            <input type="text" name="industry" class="mt-2 w-full border-b border-border bg-transparent py-2 text-sm text-white focus:border-white focus:outline-none placeholder:text-zinc-700" placeholder="e.g. Logistics / Real Estate">
-          </div>
-        </div>
+        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">FR IMMO · Email Nurturing · J+2 / J+7 / J+14 Sequences</p>
+        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">FR IMMO · Email Nurturing · Séquences J+2 / J+7 / J+14</p>
+
         <div>
-          <label class="block font-mono text-[10px] uppercase tracking-wider text-textMuted">Operational Bottlenecks / Specifications</label>
-          <textarea name="message" rows="4" required class="mt-2 w-full border border-border bg-transparent p-3 text-sm text-white focus:border-white focus:outline-none placeholder:text-zinc-700 resize-none font-sans" placeholder="Describe the current architecture data flaws or manual overhead processes..."></textarea>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
+          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">After property visits, 70% of prospects were lost due to lack of follow-up. Sales agents had no bandwidth to send personalized emails manually. Without a CRM pipeline, hot leads cooled off within days and were never re-engaged.</p>
+          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">Après les visites, 70% des prospects étaient perdus faute de suivi. Les agents n'avaient pas le temps d'envoyer des emails personnalisés manuellement. Sans pipeline CRM, les leads chauds refroidissaient en quelques jours.</p>
         </div>
-        
-        <button type="submit" id="submitBtn" class="w-full border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 py-3.5 text-xs font-mono tracking-widest uppercase text-white transition-all cursor-pointer shadow-lg">
-          <span class="trans-en">Transmit Spec Data</span><span class="trans-fr">Transmettre le Brief</span>
+      </div>
+
+      <div style="padding:40px">
+        <div style="margin-bottom:24px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">1</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Tally Form Trigger:</strong> After each visit, agents fill a quick Tally form. Data (name, email, property, budget, status) is instantly logged to Google Sheets and the nurturing sequence begins.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Déclencheur Tally:</strong> Après chaque visite, les agents remplissent un formulaire Tally. Les données sont enregistrées dans Google Sheets et la séquence commence.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">2</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Gemini 2.5 Flash Copywriting:</strong> Each email is generated fresh by Gemini with full prospect context — J+2 warm follow-up, J+7 expert tips, J+14 urgency with soft scarcity. Markdown stripped, subject parsed automatically.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Rédaction Gemini 2.5 Flash:</strong> Chaque email est généré par Gemini avec le contexte complet du prospect — J+2 prise de nouvelles, J+7 conseils experts, J+14 urgence douce.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="step-num">3</div>
+              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Smart Status Gate:</strong> Before each send, the workflow checks Google Sheets for status. If "Fermé" (won), the sequence stops. Managers receive a notification with a deep-link to the exact row to close leads manually.</p>
+              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Porte de Statut Intelligente:</strong> Avant chaque envoi, le workflow vérifie le statut dans Google Sheets. Si "Fermé" (gagné), la séquence s'arrête. Les managers reçoivent une notification avec un lien direct vers la ligne.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:12px;padding:20px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#10B981;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
+          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">3 personalized emails per prospect sent automatically at J+2, J+7, and J+14. Sales agents are notified only when human action is needed. Conversion pipeline fully automated. <strong style="color:#34D399">Zero email written manually. Sequence runs in perpetuity.</strong></p>
+          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">3 emails personnalisés envoyés automatiquement à J+2, J+7 et J+14. Les agents ne sont notifiés que si une action humaine est nécessaire. <strong style="color:#34D399">Zéro email écrit manuellement. La séquence tourne indéfiniment.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ TECH STACK ═══════════════════════════ -->
+<section id="stack" style="padding:100px 24px;background:#070B10;border-top:1px solid #1C2A38;border-bottom:1px solid #1C2A38">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal" style="text-align:center;margin-bottom:56px">
+      <div class="section-label" style="margin-bottom:12px"><span class="en">Technology</span><span class="fr">Technologies</span></div>
+      <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:12px">The stack behind<br/>every workflow</h2>
+      <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:12px">Le stack derrière<br/>chaque workflow</h2>
+      <p class="en" style="color:#4B6580;font-size:15px;max-width:460px;margin:0 auto">Battle-tested tools, integrated with surgical precision.</p>
+      <p class="fr" style="color:#4B6580;font-size:15px;max-width:460px;margin:0 auto">Des outils éprouvés, intégrés avec précision chirurgicale.</p>
+    </div>
+
+    <!-- Automation -->
+    <div class="reveal" style="margin-bottom:40px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">Automation & Orchestration</span><span class="fr">Automatisation & Orchestration</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#FF6C37;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/><circle cx="12" cy="12" r="3" fill="white"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">n8n</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Workflow Engine</span><span class="fr">Moteur Workflows</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Make</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Visual Automation</span><span class="fr">Automatisation Visuelle</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.101-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.293-.524.066-.601.33-.8.242-.175.485-.449.728-.675.213-.21.274-.362.25-.599-.025-.223-.364-1.476-.497-2.023-.136-.584-.282-.505-.474-.515-.167-.007-.341-.009-.516-.009-.171 0-.448.064-.683.324-.232.26-.886.866-.886 2.12s.908 2.461 1.034 2.63c.128.165 1.797 2.733 4.349 3.835.608.261 1.083.415 1.452.53.61.194 1.165.167 1.605.101.49-.073 1.493-.613 1.704-1.204.21-.586.21-1.088.148-1.19-.064-.101-.243-.15-.51-.3z"/><path d="M12 2.163c-5.435 0-9.856 4.412-9.856 9.837 0 1.735.453 3.358 1.244 4.762L2 22l5.34-1.402A9.756 9.756 0 0012 22c5.435 0 9.856-4.413 9.856-9.838C21.856 6.575 17.435 2.163 12 2.163z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">WhatsApp</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Messaging Channel</span><span class="fr">Canal de Messagerie</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#1A73E8;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Google Suite</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Sheets, Calendar, Gmail</span><span class="fr">Sheets, Agenda, Gmail</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI -->
+    <div class="reveal" style="margin-bottom:40px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">AI & Language Models</span><span class="fr">IA & Modèles de Langage</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#10A37F;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">OpenAI GPT-4o</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Reasoning + Vision</span><span class="fr">Raisonnement + Vision</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#4285F4,#34A853,#FBBC05,#EA4335);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Gemini 2.5 Flash</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Copywriting & Analysis</span><span class="fr">Rédaction & Analyse</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#FF6B6B;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">OpenRouter</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">LLM Gateway</span><span class="fr">Passerelle LLM</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#CC785C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 18.5c3.5-3 7-5.5 7-10a7 7 0 0 0-14 0c0 4.5 3.5 7 7 10z"/><circle cx="12" cy="10" r="2" fill="white" stroke="none"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Claude API</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Anthropic Models</span><span class="fr">Modèles Anthropic</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data -->
+    <div class="reveal">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">Data & Storage</span><span class="fr">Données & Stockage</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#1B9C3E;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><ellipse cx="12" cy="6" rx="9" ry="3"/><path d="M3 6v6c0 1.66 4.03 3 9 3s9-1.34 9-3V6"/><path d="M3 12v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">NocoDB</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">No-Code Database</span><span class="fr">Base de Données No-Code</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#3ECF8E;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1a1a1a"><path d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C.111 12.888.706 14.09 1.771 14.09h9.181l-.012 9.877c.015.987 1.26 1.41 1.874.637l9.262-11.649c.654-.837.059-2.041-.996-2.041l-9.181-.001.012-9.877z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Supabase</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Realtime Postgres</span><span class="fr">Postgres Temps Réel</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#3448C5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6" stroke="#3448C5" stroke-width="2" fill="none"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Airtable</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Flexible CRM Base</span><span class="fr">Base CRM Flexible</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#F6821F;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-11h2v2h-2zm0 4h2v4h-2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Cloudinary</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Media CDN</span><span class="fr">CDN Médias</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#3776AB;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l8 4V12l-8 4-8-4V8.18l8-4zM4 13.82L12 18l8-4.18V17l-8 4-8-4v-3.18z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Python</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Custom Scripts</span><span class="fr">Scripts Personnalisés</span></div>
+          </div>
+        </div>
+        <div class="tech-pill">
+          <div style="width:36px;height:36px;border-radius:8px;background:#191919;border:1px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M9 4L3 12l6 8M15 4l6 8-6 8M14 4l-4 16"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Webhooks</div>
+            <div style="font-size:11px;color:#4B6580"><span class="en">Event Triggers</span><span class="fr">Déclencheurs Événements</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ HOW WE WORK ═══════════════════════════ -->
+<section style="padding:100px 24px;max-width:900px;margin:0 auto">
+  <div class="reveal" style="text-align:center;margin-bottom:56px">
+    <div class="section-label" style="margin-bottom:12px"><span class="en">Process</span><span class="fr">Processus</span></div>
+    <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em">How we deliver</h2>
+    <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em">Notre méthode de livraison</h2>
+  </div>
+
+  <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:#1C2A38;border-radius:16px;overflow:hidden">
+    <div style="background:#0D1117;padding:32px 28px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">01 —</div>
+      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Discovery Call</span><span class="fr">Appel de Découverte</span></div>
+      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">We map your current process, identify the highest-ROI automation opportunities, and scope the project.</p>
+      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">On cartographie votre processus actuel, identifie les opportunités d'automatisation à fort ROI et cadrons le projet.</p>
+    </div>
+    <div style="background:#0D1117;padding:32px 28px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">02 —</div>
+      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Design & Build</span><span class="fr">Conception & Développement</span></div>
+      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">We design the workflow architecture, build each node, connect every API, and stress-test edge cases.</p>
+      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">On conçoit l'architecture, construit chaque nœud, connecte chaque API et teste les cas limites.</p>
+    </div>
+    <div style="background:#0D1117;padding:32px 28px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">03 —</div>
+      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Deploy & Handoff</span><span class="fr">Déploiement & Transfert</span></div>
+      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">Live deployment, full documentation, and a Loom walkthrough so your team owns the system completely.</p>
+      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">Déploiement en production, documentation complète et walkthrough vidéo pour que votre équipe maîtrise le système.</p>
+    </div>
+    <div style="background:#0D1117;padding:32px 28px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">04 —</div>
+      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Async Support</span><span class="fr">Support Asynchrone</span></div>
+      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">All communication is async via email, Slack, or WhatsApp. No timezone friction. We work globally.</p>
+      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">Toute communication est async par email, Slack ou WhatsApp. Aucun problème de fuseau horaire. On travaille à l'international.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ CONTACT ═══════════════════════════ -->
+<section id="contact" style="padding:100px 24px;background:#070B10;border-top:1px solid #1C2A38;position:relative;overflow:hidden">
+  <div style="position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,.05) 0%,transparent 70%);pointer-events:none"></div>
+
+  <div style="max-width:640px;margin:0 auto;position:relative;z-index:1">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="section-label" style="margin-bottom:12px"><span class="en">Get in Touch</span><span class="fr">Contactez-nous</span></div>
+      <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:14px">Ready to automate<br/><span style="color:#22D3EE">your first workflow?</span></h2>
+      <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:14px">Prêt à automatiser<br/><span style="color:#22D3EE">votre premier workflow ?</span></h2>
+      <p class="en" style="color:#4B6580;font-size:15px;line-height:1.6">Send us a message. We respond within 24 hours via email. All communication is in English or French.</p>
+      <p class="fr" style="color:#4B6580;font-size:15px;line-height:1.6">Envoyez-nous un message. Nous répondons dans les 24 heures par email. Toute communication en anglais ou en français.</p>
+    </div>
+
+    <div class="card reveal" style="padding:40px">
+      <form id="contact-form" onsubmit="handleSubmit(event)" style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Full Name</span><span class="fr">Nom Complet</span></label>
+            <input type="text" name="name" required class="input-field" placeholder="John Smith" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Email Address</span><span class="fr">Adresse Email</span></label>
+            <input type="email" name="email" required class="input-field" placeholder="john@company.com" />
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Company / Project</span><span class="fr">Entreprise / Projet</span></label>
+          <input type="text" name="company" class="input-field" placeholder="Acme Corp" />
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Industry</span><span class="fr">Secteur d'activité</span></label>
+          <select name="industry" class="input-field" style="cursor:pointer;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234B6580' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 16px center">
+            <option value="" style="background:#0D1117">
+              <span class="en">Select industry…</span><span class="fr">Choisir le secteur…</span>
+            </option>
+            <option value="real_estate" style="background:#0D1117">Real Estate / Immobilier</option>
+            <option value="healthcare" style="background:#0D1117">Healthcare / Santé</option>
+            <option value="ecommerce" style="background:#0D1117">E-Commerce</option>
+            <option value="saas" style="background:#0D1117">SaaS / Tech</option>
+            <option value="finance" style="background:#0D1117">Finance</option>
+            <option value="agency" style="background:#0D1117">Agency / Marketing</option>
+            <option value="other" style="background:#0D1117">Other / Autre</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">What do you want to automate?</span><span class="fr">Qu'est-ce que vous souhaitez automatiser ?</span></label>
+          <textarea name="message" required class="input-field" rows="4" style="resize:vertical;min-height:100px" placeholder="e.g., Our lead qualification process takes 3 hours/day and we want to automate it with AI…"></textarea>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="checkbox" name="consent" required style="margin-top:2px;width:14px;height:14px;accent-color:#22D3EE;flex-shrink:0" />
+            <span style="font-size:12px;color:#4B6580;line-height:1.5"><span class="en">I agree to be contacted by Flowscale Agency regarding my automation project.</span><span class="fr">J'accepte d'être contacté par Flowscale Agency concernant mon projet d'automatisation.</span></span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px" id="submit-btn">
+          <span id="submit-text-en" class="en"><span class="en">Send Message</span></span>
+          <span id="submit-text-fr" class="fr">Envoyer le Message</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M14 8H2M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </form>
+
+      <!-- Success message -->
+      <div id="success-msg" style="display:none;text-align:center;padding:32px 0">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="en" style="font-size:17px;font-weight:600;color:#F1F5F9;margin-bottom:6px">Message sent!</div>
+        <div class="fr" style="font-size:17px;font-weight:600;color:#F1F5F9;margin-bottom:6px">Message envoyé !</div>
+        <p class="en" style="font-size:14px;color:#4B6580">We'll get back to you within 24 hours. Check your inbox.</p>
+        <p class="fr" style="font-size:14px;color:#4B6580">Nous vous répondrons dans les 24 heures. Vérifiez votre boîte mail.</p>
+      </div>
     </div>
-  </section>
 
-  <footer class="border-t border-border bg-slate0 py-10 text-center font-mono text-[10px] tracking-wider text-zinc-600 relative z-10">
-    <div class="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p>&copy; 2026 Flowscale Architecture. All rights reserved.</p>
-      <p class="text-zinc-700">// High-Speed Asynchronous Pipelines</p>
+    <!-- Social / contact links -->
+    <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:32px;flex-wrap:wrap">
+      <a href="mailto:hello@flowscale.agency" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#94A3B8'" onmouseout="this.style.color='#4B6580'">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.5"/></svg>
+        hello@flowscale.agency
+      </a>
+      <div style="width:4px;height:4px;border-radius:50%;background:#1C2A38"></div>
+      <a href="https://upwork.com/freelancers/sabig" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#94A3B8'" onmouseout="this.style.color='#4B6580'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.561 13.158c-1.102 0-2.135-.467-3.074-1.227l.228-1.076.008-.042c.207-1.143.849-3.06 2.839-3.06 1.492 0 2.703 1.212 2.703 2.703-.001 1.489-1.212 2.702-2.704 2.702zm0-8.14c-2.539 0-4.51 1.649-5.31 4.366-1.22-1.834-2.148-4.036-2.687-5.892H7.828v7.112c-.002 1.406-1.141 2.546-2.547 2.548-1.405-.002-2.543-1.142-2.545-2.548V3.492H0v7.112c0 2.914 2.37 5.303 5.281 5.303 2.913 0 5.283-2.389 5.283-5.303v-1.19c.529 1.107 1.182 2.229 1.974 3.221l-1.673 7.873h2.797l1.213-5.71c1.063.679 2.285 1.109 3.686 1.109 3 0 5.439-2.452 5.439-5.45 0-3-2.439-5.439-5.439-5.439z"/></svg>
+        Upwork Profile
+      </a>
+      <div style="width:4px;height:4px;border-radius:50%;background:#1C2A38"></div>
+      <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="en">Cotonou, Bénin · Global</span>
+        <span class="fr">Cotonou, Bénin · Mondial</span>
+      </span>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // Initialize Minimalist Scroll Animations (AOS)
-    AOS.init({ duration: 600, once: true, delay: 0 });
 
-    // Multilingual Controller Toggle
-    const langBtn = document.getElementById('langToggle');
-    langBtn.addEventListener('click', () => {
-      if (document.body.classList.contains('lang-en')) {
-        document.body.classList.remove('lang-en');
-        document.body.classList.add('lang-fr');
-      } else {
-        document.body.classList.remove('lang-fr');
-        document.body.classList.add('lang-en');
-      }
-    });
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer style="padding:40px 24px;border-top:1px solid #1C2A38;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;max-width:1200px;margin:0 auto">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#0891B2,#22D3EE);display:flex;align-items:center;justify-content:center">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 2 10 2-5 1 0" stroke="#030507" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="8" r="1.5" fill="#030507"/></svg>
+    </div>
+    <span style="font-size:14px;font-weight:600;color:#94A3B8">Flowscale<span style="color:#22D3EE">.</span></span>
+    <span style="font-size:13px;color:#4B6580">© 2025</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:pulse 2.5s infinite"></div>
+    <span class="en" style="font-size:12px;color:#4B6580">Available for new projects</span>
+    <span class="fr" style="font-size:12px;color:#4B6580">Disponible pour de nouveaux projets</span>
+  </div>
+  <div style="font-family:'DM Mono',monospace;font-size:11px;color:#4B6580">
+    Built with n8n · <span class="en">Powered by AI</span><span class="fr">Propulsé par IA</span>
+  </div>
+</footer>
 
-    // Form Ingestion Logic connected to n8n Webhook Router
-    const form = document.getElementById('contactForm');
-    const btn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const isEN = document.body.classList.contains('lang-en');
+<script>
+  /* Language switcher */
+  function setLang(lang) {
+    document.body.classList.remove('lang-en', 'lang-fr');
+    document.body.classList.add('lang-' + lang);
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+    document.documentElement.lang = lang;
+  }
 
-      btn.disabled = true;
-      btn.innerHTML = isEN ? 'TRANSMITTING ENCRYPTED PAYLOAD...' : 'TRANSMISSION DES DONNÉES...';
+  /* Scroll reveal */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-      const payload = {
-        name: form.name.value,
-        email: form.email.value,
-        company: form.company.value,
-        industry: form.industry.value,
-        message: form.message.value,
-        system_language: isEN ? 'en' : 'fr',
-        channel: 'inbound_web_flowscale',
-        timestamp: new Date().toISOString()
-      };
+  /* Navbar scroll effect */
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 40) {
+      nav.style.borderBottomColor = 'rgba(28,42,56,1)';
+    } else {
+      nav.style.borderBottomColor = 'rgba(28,42,56,.6)';
+    }
+  });
 
-      try {
-        /* Votre URL de Webhook n8n final viendra ici */
-        const WEBHOOK_ENDPOINT = 'https://your-n8n-instance.com/webhook/flowscale-contact';
+  /* Contact form — sends to n8n webhook */
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('submit-btn');
+    const langEN = document.body.classList.contains('lang-fr');
 
-        await fetch(WEBHOOK_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          mode: 'no-cors'
-        });
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-dasharray="28 28" stroke-linecap="round" style="animation:spin 1s linear infinite;transform-origin:center"><animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/></circle></svg> ' + (langEN ? 'Envoi...' : 'Sending...');
 
-        btn.className = "w-full border border-emerald-800 bg-emerald-950/40 py-3.5 text-xs font-mono tracking-widest uppercase text-emerald-400 text-center";
-        btn.innerHTML = isEN ? '// DATA TRANSMITTED. RESPONSE VIA WRITTEN CHANNELS.' : '// SÉCURISÉ. COMMITTED. RÉPONSE SOUS PEU PAR ÉCRIT.';
-        form.reset();
-      } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = isEN ? 'TRANSMISSION FAILED. RETRY.' : 'ÉCHEC ENVOI. RÉESSAYER.';
-      }
-    });
-  </script>
+    const data = {
+      name: form.name.value,
+      email: form.email.value,
+      company: form.company.value,
+      industry: form.industry.value,
+      message: form.message.value,
+      lang: document.body.classList.contains('lang-fr') ? 'fr' : 'en',
+      source: 'flowscale-website',
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      /* Replace the URL below with your actual n8n webhook URL */
+      const WEBHOOK_URL = 'https://your-n8n-instance.com/webhook/flowscale-contact';
+
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        mode: 'no-cors'
+      });
+    } catch (err) {
+      console.log('Webhook delivery attempted:', err);
+    }
+
+    /* Always show success — no-cors means we can't read the response */
+    form.style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+</script>
 </body>
 </html>
