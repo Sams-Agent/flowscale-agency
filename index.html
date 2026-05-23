@@ -1,536 +1,927 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flowscale Agency — AI Automation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: { inter: ['Inter','sans-serif'], mono: ['DM Mono','monospace'] },
-        colors: {
-          bg0:'#030507', bg1:'#070B10', bg2:'#0D1117', bg3:'#111720',
-          border:'#1C2A38', borderhi:'#2A3D52',
-          cyan:'#22D3EE', cyanlo:'#0891B2', cyandim:'#0E4A5C',
-          blue:'#3B82F6', bluedim:'#1E3A5F',
-          text1:'#F1F5F9', text2:'#94A3B8', text3:'#4B6580',
-          green:'#10B981', greenlo:'#064E3B',
-          amber:'#F59E0B', amberlo:'#451A03',
-        },
-        animation: {
-          'fade-up':'fadeUp .6s ease forwards',
-          'fade-in':'fadeIn .5s ease forwards',
-          'pulse-slow':'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
-        },
-        keyframes: {
-          fadeUp:{ '0%':{opacity:'0',transform:'translateY(24px)'},'100%':{opacity:'1',transform:'translateY(0)'} },
-          fadeIn:{ '0%':{opacity:'0'},'100%':{opacity:'1'} },
-        }
-      }
-    }
-  }
-</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Flowscale — AI Automation Studio</title>
+
+<!-- Fonts: Syne (display) + Instrument Serif (editorial) + JetBrains Mono (code) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:'Inter',sans-serif;background:#030507;color:#F1F5F9;overflow-x:hidden}
-  ::-webkit-scrollbar{width:4px}
-  ::-webkit-scrollbar-track{background:#070B10}
-  ::-webkit-scrollbar-thumb{background:#1C2A38;border-radius:99px}
-  ::-webkit-scrollbar-thumb:hover{background:#2A3D52}
+/* ─── RESET & BASE ───────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:'Syne',sans-serif;
+  background:#0C0B09;
+  color:#F0EAD9;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:#0C0B09}
+::-webkit-scrollbar-thumb{background:#2E2C27;border-radius:99px}
 
-  /* Noise overlay */
-  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+/* ─── CSS VARS ───────────────────────────────────── */
+:root{
+  --ink:    #0C0B09;
+  --paper:  #F0EAD9;
+  --dim:    #8C8473;
+  --faint:  #1E1D19;
+  --border: #2A2920;
+  --accent: #E8500A;     /* electric orange – distinctive, not cyan */
+  --green:  #3DDB7A;     /* result / success */
+  --blue:   #4F8EF7;     /* info / secondary */
+  --mono:   'JetBrains Mono', monospace;
+  --serif:  'Instrument Serif', Georgia, serif;
+  --sans:   'Syne', sans-serif;
+}
 
-  /* Grid accent */
-  .grid-bg{background-image:linear-gradient(rgba(34,211,238,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.035) 1px,transparent 1px);background-size:48px 48px}
+/* ─── TYPOGRAPHY ─────────────────────────────────── */
+h1,h2,h3,h4{font-family:var(--sans);font-weight:800;line-height:1.05;letter-spacing:-.03em}
+.serif{font-family:var(--serif);font-style:italic;font-weight:400}
+.mono{font-family:var(--mono);font-size:.75em;letter-spacing:.04em}
+.label{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.accent-text{color:var(--accent)}
+.green-text{color:var(--green)}
 
-  .glow-cyan{box-shadow:0 0 40px rgba(34,211,238,.12),0 0 80px rgba(34,211,238,.06)}
-  .glow-line{box-shadow:0 1px 0 0 rgba(34,211,238,.3)}
+/* ─── LAYOUT ─────────────────────────────────────── */
+.container{max-width:1180px;margin:0 auto;padding:0 32px}
+section{padding:100px 0}
 
-  .card{background:#0D1117;border:1px solid #1C2A38;border-radius:16px;transition:border-color .25s,box-shadow .25s}
-  .card:hover{border-color:#2A3D52;box-shadow:0 0 32px rgba(34,211,238,.08)}
+/* ─── NAV ────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:60px;
+  background:rgba(12,11,9,.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{
+  width:30px;height:30px;border-radius:6px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-logo-name{font-weight:800;font-size:15px;letter-spacing:-.02em}
+.nav-links{display:flex;gap:36px}
+.nav-links a{font-size:13px;font-weight:500;color:var(--dim);transition:color .2s}
+.nav-links a:hover{color:var(--paper)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang-pill{
+  display:flex;background:var(--faint);border:1px solid var(--border);
+  border-radius:99px;overflow:hidden;
+}
+.lang-btn{
+  padding:5px 13px;font-size:12px;font-weight:600;
+  font-family:var(--mono);cursor:pointer;border:none;
+  background:transparent;color:var(--dim);
+  transition:all .2s;
+}
+.lang-btn.on{background:var(--accent);color:#fff}
+.lang-btn:not(.on):hover{color:var(--paper)}
 
-  .tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-  .tag-cyan{background:rgba(34,211,238,.1);color:#22D3EE;border:1px solid rgba(34,211,238,.2)}
-  .tag-blue{background:rgba(59,130,246,.1);color:#60A5FA;border:1px solid rgba(59,130,246,.2)}
-  .tag-green{background:rgba(16,185,129,.1);color:#34D399;border:1px solid rgba(16,185,129,.2)}
+/* ─── LANGUAGE TOGGLE ────────────────────────────── */
+body.lang-fr .en{display:none!important}
+body.lang-en .fr{display:none!important}
 
-  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,#0891B2,#22D3EE);color:#030507;font-weight:600;font-size:14px;border-radius:10px;border:none;cursor:pointer;transition:opacity .2s,transform .15s}
-  .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-  .btn-primary:active{transform:translateY(0)}
+/* ─── HERO ───────────────────────────────────────── */
+.hero{
+  min-height:100vh;
+  position:relative;
+  display:flex;align-items:flex-end;
+  padding-bottom:80px;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1920&q=60');
+  background-size:cover;background-position:center;
+  filter:brightness(.35) saturate(.6);
+  z-index:0;
+  transform:scale(1.02);
+  transition:transform 8s ease-out;
+}
+.hero-bg.loaded{transform:scale(1)}
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(to top, rgba(12,11,9,1) 0%, rgba(12,11,9,.7) 40%, rgba(12,11,9,.2) 100%),
+    linear-gradient(to right, rgba(12,11,9,.6) 0%, transparent 60%);
+}
+.hero-content{
+  position:relative;z-index:2;
+  width:100%;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:flex-end;
+  gap:60px;
+}
+.hero-left{}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 12px;
+  border:1px solid rgba(232,80,10,.35);
+  border-radius:4px;
+  margin-bottom:28px;
+}
+.hero-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{font-size:clamp(42px,5.5vw,78px);line-height:1.02;margin-bottom:28px}
+.hero-h1 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--dim);line-height:1.7;max-width:440px;margin-bottom:40px;font-weight:400}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn-a{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:6px;
+  background:var(--accent);color:#fff;
+  font-family:var(--sans);font-weight:700;font-size:13px;
+  border:none;cursor:pointer;
+  transition:background .2s,transform .15s;
+}
+.btn-a:hover{background:#cf4208;transform:translateY(-1px)}
+.btn-b{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:6px;
+  background:transparent;color:var(--paper);
+  font-family:var(--sans);font-weight:600;font-size:13px;
+  border:1px solid var(--border);cursor:pointer;
+  transition:all .2s;
+}
+.btn-b:hover{border-color:#4A4840;background:var(--faint)}
+.hero-right{
+  display:flex;flex-direction:column;gap:2px;
+  align-self:flex-end;
+}
+.hero-stat-row{
+  display:flex;align-items:baseline;gap:14px;
+  padding:20px 0;
+  border-bottom:1px solid var(--border);
+}
+.hero-stat-row:last-child{border-bottom:none}
+.hero-stat-num{
+  font-size:48px;font-weight:800;line-height:1;
+  letter-spacing:-.05em;color:var(--paper);
+  font-variant-numeric:tabular-nums;
+}
+.hero-stat-label{font-size:13px;color:var(--dim);font-weight:400;line-height:1.4}
 
-  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;color:#94A3B8;font-weight:500;font-size:14px;border-radius:10px;border:1px solid #1C2A38;cursor:pointer;transition:all .2s}
-  .btn-ghost:hover{border-color:#2A3D52;color:#F1F5F9;background:#0D1117}
+/* ─── MARQUEE ─────────────────────────────────────── */
+.marquee-wrap{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:14px 0;
+  overflow:hidden;
+  background:var(--faint);
+}
+.marquee-track{
+  display:flex;width:max-content;
+  animation:scroll 28s linear infinite;
+}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:10px;
+  padding:0 28px;
+  white-space:nowrap;
+  font-family:var(--mono);font-size:11px;
+  color:var(--dim);letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
 
-  .lang-btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid #1C2A38}
-  .lang-btn.active{background:rgba(34,211,238,.12);color:#22D3EE;border-color:rgba(34,211,238,.3)}
-  .lang-btn:not(.active){background:transparent;color:#4B6580}
-  .lang-btn:not(.active):hover{color:#94A3B8;border-color:#2A3D52}
+/* ─── SECTION HEADER ──────────────────────────────── */
+.sh{margin-bottom:60px}
+.sh .label{margin-bottom:14px}
+.sh-title{font-size:clamp(30px,4vw,52px);margin-bottom:16px}
+.sh-sub{font-size:15px;color:var(--dim);line-height:1.65;font-weight:400;max-width:480px}
 
-  .input-field{width:100%;background:#0D1117;border:1px solid #1C2A38;border-radius:10px;padding:12px 16px;color:#F1F5F9;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
-  .input-field::placeholder{color:#4B6580}
-  .input-field:focus{border-color:rgba(34,211,238,.4);box-shadow:0 0 0 3px rgba(34,211,238,.08)}
+/* ─── PORTFOLIO ───────────────────────────────────── */
+.cases{display:flex;flex-direction:column;gap:1px;background:var(--border)}
+.case{
+  background:var(--ink);
+  padding:52px 0;
+  display:grid;
+  grid-template-columns:80px 1fr 1fr;
+  gap:48px;
+  align-items:start;
+  transition:background .25s;
+}
+.case:hover{background:#0F0E0C}
+.case-num{
+  font-family:var(--mono);
+  font-size:11px;color:var(--dim);
+  letter-spacing:.1em;padding-top:6px;
+  text-align:right;
+}
+.case-meta{}
+.case-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.tag{
+  padding:3px 9px;border-radius:3px;
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.06em;font-weight:500;
+  border:1px solid;
+}
+.tag-o{color:var(--accent);border-color:rgba(232,80,10,.3);background:rgba(232,80,10,.07)}
+.tag-g{color:var(--green);border-color:rgba(61,219,122,.3);background:rgba(61,219,122,.07)}
+.tag-b{color:var(--blue);border-color:rgba(79,142,247,.3);background:rgba(79,142,247,.07)}
+.case-title{font-size:clamp(20px,2.2vw,28px);margin-bottom:8px;line-height:1.2}
+.case-sub{font-size:13px;color:var(--dim);font-weight:400;margin-bottom:28px}
+.case-block{margin-bottom:20px}
+.case-block-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:10px;
+}
+.case-block-text{font-size:14px;color:#A09880;line-height:1.7;font-weight:400}
+.case-block-text strong{color:var(--paper);font-weight:600}
+.case-result{
+  margin-top:24px;
+  padding:20px 22px;
+  background:rgba(61,219,122,.05);
+  border-left:2px solid var(--green);
+  border-radius:0 6px 6px 0;
+}
+.case-result-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.case-result-text{font-size:14px;color:#A09880;line-height:1.7;font-weight:400}
+.case-result-text strong{color:var(--green);font-weight:700}
+.case-steps{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-n{
+  width:22px;height:22px;border-radius:50%;
+  flex-shrink:0;margin-top:1px;
+  background:rgba(232,80,10,.12);
+  border:1px solid rgba(232,80,10,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:500;
+}
+.step-text{font-size:13px;color:#8C8473;line-height:1.65;font-weight:400}
+.step-text strong{color:#C8BFA8;font-weight:600}
 
-  .section-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#0891B2}
+/* ─── STACK ───────────────────────────────────────── */
+.stack-section{background:var(--faint);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
+.stack-cell{
+  background:var(--faint);
+  padding:32px 28px;
+  transition:background .2s;
+  cursor:default;
+}
+.stack-cell:hover{background:#161511}
+.stack-cat{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);
+  margin-bottom:28px;padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.stack-item{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.stack-item:last-child{margin-bottom:0}
+.stack-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stack-name{font-size:14px;font-weight:600;color:var(--paper)}
+.stack-desc{font-size:12px;color:var(--dim);font-weight:400;margin-left:18px;margin-top:2px}
 
-  .step-num{width:28px;height:28px;border-radius:50%;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#22D3EE;flex-shrink:0}
+/* ─── PROCESS ─────────────────────────────────────── */
+.process-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  position:relative;gap:0;
+}
+.process-steps::before{
+  content:'';
+  position:absolute;top:18px;left:calc(12.5% + 9px);
+  right:calc(12.5% + 9px);
+  height:1px;background:var(--border);z-index:0;
+}
+.p-step{padding:0 24px}
+.p-step-top{display:flex;align-items:center;gap:12px;margin-bottom:20px;position:relative;z-index:1}
+.p-step-circle{
+  width:36px;height:36px;border-radius:50%;
+  flex-shrink:0;
+  background:var(--faint);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.p-step-circle.active{background:var(--accent);border-color:var(--accent)}
+.p-step-n{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:500}
+.p-step-title{font-size:15px;font-weight:700;margin-bottom:10px}
+.p-step-text{font-size:13px;color:var(--dim);line-height:1.65;font-weight:400}
 
-  /* Language toggling */
-  .en, .fr { transition: opacity .2s }
-  body.lang-fr .en { display: none !important }
-  body.lang-en .fr { display: none !important }
+/* ─── CONTACT ─────────────────────────────────────── */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.contact-left{}
+.contact-quote{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(20px,2.5vw,32px);
+  line-height:1.4;color:var(--paper);
+  margin-bottom:36px;
+}
+.contact-quote em{color:var(--accent);font-style:normal}
+.contact-attrs{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
+.contact-attr{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--dim)}
+.contact-attr-icon{width:32px;height:32px;border-radius:6px;background:var(--faint);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-right{}
+.form{display:flex;flex-direction:column;gap:18px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.field input,
+.field select,
+.field textarea{
+  background:#111009;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:11px 14px;
+  color:var(--paper);
+  font-family:var(--sans);font-size:14px;font-weight:400;
+  outline:none;
+  transition:border-color .2s;
+  width:100%;
+}
+.field input::placeholder,
+.field textarea::placeholder{color:var(--dim)}
+.field select{cursor:pointer;appearance:none}
+.field input:focus,
+.field select:focus,
+.field textarea:focus{border-color:rgba(232,80,10,.5)}
+.field textarea{resize:vertical;min-height:110px}
+.check-row{display:flex;align-items:flex-start;gap:10px}
+.check-row input[type=checkbox]{
+  width:14px;height:14px;margin-top:2px;
+  flex-shrink:0;accent-color:var(--accent);cursor:pointer;
+}
+.check-row span{font-size:12px;color:var(--dim);line-height:1.55}
+.submit-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px;border-radius:6px;
+  background:var(--accent);color:#fff;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  border:none;cursor:pointer;
+  transition:background .2s,transform .15s;
+  width:100%;
+}
+.submit-btn:hover{background:#cf4208;transform:translateY(-1px)}
+.success-box{
+  display:none;
+  text-align:center;padding:48px 0;
+}
+.success-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(61,219,122,.1);
+  border:1px solid rgba(61,219,122,.3);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+}
 
-  .reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
-  .reveal.visible{opacity:1;transform:translateY(0)}
+/* ─── FOOTER ─────────────────────────────────────────*/
+footer{
+  padding:36px 0;
+  border-top:1px solid var(--border);
+}
+.footer-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-status{display:flex;align-items:center;gap:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 3s ease-in-out infinite}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em;transition:color .2s}
+.footer-links a:hover{color:var(--paper)}
 
-  /* Animated border on hero card */
-  @keyframes borderFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  .hero-card-border{position:relative}
-  .hero-card-border::before{content:'';position:absolute;inset:-1px;border-radius:17px;background:linear-gradient(90deg,#22D3EE22,#3B82F622,#22D3EE22);background-size:200%;animation:borderFlow 4s linear infinite;z-index:-1}
+/* ─── DIVIDER ──────────────────────────────────────── */
+.divider{height:1px;background:var(--border)}
 
-  .tech-pill{display:flex;align-items:center;gap:10px;padding:14px 18px;background:#0D1117;border:1px solid #1C2A38;border-radius:12px;transition:all .2s}
-  .tech-pill:hover{border-color:#2A3D52;background:#111720;transform:translateY(-2px)}
+/* ─── REVEAL ANIMATION ─────────────────────────────── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
 
-  /* Mobile nav */
-  @media(max-width:768px){
-    .nav-links{display:none}
-  }
+/* ─── RESPONSIVE ────────────────────────────────────── */
+@media(max-width:900px){
+  .hero-content{grid-template-columns:1fr}
+  .hero-right{flex-direction:row;gap:0}
+  .hero-stat-row{flex:1;flex-direction:column;gap:4px;padding:16px 12px;border-bottom:none;border-right:1px solid var(--border)}
+  .hero-stat-row:last-child{border-right:none}
+  .hero-stat-num{font-size:36px}
+  .case{grid-template-columns:1fr}
+  .case-num{display:none}
+  .contact-grid{grid-template-columns:1fr}
+  .process-steps{grid-template-columns:1fr 1fr;gap:32px}
+  .process-steps::before{display:none}
+  nav .nav-links{display:none}
+}
+@media(max-width:600px){
+  .container{padding:0 20px}
+  section{padding:72px 0}
+  .form-row{grid-template-columns:1fr}
+  .process-steps{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body class="lang-en">
 
-<!-- ═══════════════════════════ NAV ═══════════════════════════ -->
-<nav id="navbar" style="position:fixed;top:0;left:0;right:0;z-index:50;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(3,5,7,.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(28,42,56,.6);transition:all .3s">
-  <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0891B2,#22D3EE);display:flex;align-items:center;justify-content:center">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 2 10 2-5 1 0" stroke="#030507" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="8" r="1.5" fill="#030507"/></svg>
+<!-- ════ NAV ════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
-    <span style="font-weight:700;font-size:15px;color:#F1F5F9;letter-spacing:-.02em">Flowscale<span style="color:#22D3EE">.</span></span>
-  </a>
-
-  <div class="nav-links" style="display:flex;align-items:center;gap:32px">
-    <a href="#portfolio" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Portfolio</span><span class="fr">Réalisations</span></a>
-    <a href="#stack" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Tech Stack</span><span class="fr">Technologies</span></a>
-    <a href="#contact" style="font-size:13px;font-weight:500;color:#94A3B8;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#F1F5F9'" onmouseout="this.style.color='#94A3B8'"><span class="en">Contact</span><span class="fr">Contact</span></a>
+    <span class="nav-logo-name">Flowscale</span>
   </div>
 
-  <div style="display:flex;align-items:center;gap:10px">
-    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
+  <div class="nav-links">
+    <a href="#portfolio"><span class="en">Work</span><span class="fr">Projets</span></a>
+    <a href="#stack"><span class="en">Stack</span><span class="fr">Technologies</span></a>
+    <a href="#process"><span class="en">Process</span><span class="fr">Méthode</span></a>
+    <a href="#contact"><span class="en">Contact</span><span class="fr">Contact</span></a>
+  </div>
+
+  <div class="nav-right">
+    <div class="lang-pill">
+      <button class="lang-btn on" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btn-fr" onclick="setLang('fr')">FR</button>
+    </div>
   </div>
 </nav>
 
 
-<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section class="grid-bg" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;position:relative;overflow:hidden">
+<!-- ════ HERO ════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
 
-  <!-- Radial glow -->
-  <div style="position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(34,211,238,.08) 0%,transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:0;left:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(59,130,246,.06) 0%,transparent 70%);pointer-events:none"></div>
-
-  <div style="max-width:800px;text-align:center;position:relative;z-index:1">
-    <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);border-radius:99px;margin-bottom:28px">
-      <div style="width:6px;height:6px;border-radius:50%;background:#22D3EE;animation:pulse 2s infinite"></div>
-      <span class="en" style="font-size:12px;font-weight:500;color:#22D3EE;letter-spacing:.04em">AI AUTOMATION AGENCY</span>
-      <span class="fr" style="font-size:12px;font-weight:500;color:#22D3EE;letter-spacing:.04em">AGENCE D'AUTOMATISATION IA</span>
-    </div>
-
-    <h1 class="en" style="font-size:clamp(38px,6vw,72px);font-weight:700;line-height:1.08;letter-spacing:-.04em;margin-bottom:24px">
-      Scale your business<br/>
-      <span style="background:linear-gradient(90deg,#22D3EE,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">with AI & n8n automation</span>
-    </h1>
-    <h1 class="fr" style="font-size:clamp(34px,5.5vw,68px);font-weight:700;line-height:1.08;letter-spacing:-.04em;margin-bottom:24px">
-      Faites évoluer votre activité<br/>
-      <span style="background:linear-gradient(90deg,#22D3EE,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">grâce à l'IA et l'automatisation n8n</span>
-    </h1>
-
-    <p class="en" style="font-size:18px;color:#94A3B8;line-height:1.65;max-width:580px;margin:0 auto 40px">We design intelligent workflows that replace repetitive tasks, qualify leads 24/7, and connect your entire stack — without a single line of manual code.</p>
-    <p class="fr" style="font-size:18px;color:#94A3B8;line-height:1.65;max-width:580px;margin:0 auto 40px">Nous concevons des workflows intelligents qui remplacent les tâches répétitives, qualifient vos leads 24h/24 et connectent tout votre stack — sans aucune ligne de code manuel.</p>
-
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
-      <a href="#portfolio" class="btn-primary">
-        <span class="en">See case studies</span>
-        <span class="fr">Voir les projets</span>
-        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <a href="#contact" class="btn-ghost">
-        <span class="en">Get a free audit</span>
-        <span class="fr">Audit gratuit</span>
-      </a>
-    </div>
-
-    <!-- Mini stats -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:40px;margin-top:64px;flex-wrap:wrap">
-      <div style="text-align:center">
-        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">3+</div>
-        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Industries Automated</span><span class="fr">Secteurs Automatisés</span></div>
+  <div class="container hero-content">
+    <div class="hero-left">
+      <div class="hero-tag">
+        <div class="hero-tag-dot"></div>
+        <span class="label en" style="color:var(--accent);margin:0">AI Automation Studio</span>
+        <span class="label fr" style="color:var(--accent);margin:0">Studio d'Automatisation IA</span>
       </div>
-      <div style="width:1px;height:40px;background:#1C2A38"></div>
-      <div style="text-align:center">
-        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">95%</div>
-        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Tasks Eliminated</span><span class="fr">Tâches Éliminées</span></div>
-      </div>
-      <div style="width:1px;height:40px;background:#1C2A38"></div>
-      <div style="text-align:center">
-        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">24/7</div>
-        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">AI Always On</span><span class="fr">IA Disponible</span></div>
-      </div>
-      <div style="width:1px;height:40px;background:#1C2A38"></div>
-      <div style="text-align:center">
-        <div style="font-size:28px;font-weight:700;color:#F1F5F9;letter-spacing:-.03em">$0</div>
-        <div style="font-size:12px;color:#4B6580;margin-top:2px"><span class="en">Manual Dev Cost</span><span class="fr">Coût Dev Manuel</span></div>
+
+      <h1 class="hero-h1 en">
+        We build<br/><em>invisible machines</em><br/>that work for you.
+      </h1>
+      <h1 class="hero-h1 fr">
+        Nous construisons<br/>des <em>machines invisibles</em><br/>qui travaillent pour vous.
+      </h1>
+
+      <p class="hero-sub en">
+        n8n workflows and AI agents that replace repetitive tasks,
+        qualify leads 24/7, and connect every tool in your stack —
+        without a single line of manual code.
+      </p>
+      <p class="hero-sub fr">
+        Des workflows n8n et des agents IA qui éliminent les tâches répétitives,
+        qualifient vos leads en continu et connectent tous vos outils —
+        sans aucune ligne de code manuel.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#portfolio" class="btn-a">
+          <span class="en">View case studies</span>
+          <span class="fr">Voir les projets</span>
+          <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#contact" class="btn-b">
+          <span class="en">Get a free audit</span>
+          <span class="fr">Audit gratuit</span>
+        </a>
       </div>
     </div>
-  </div>
-</section>
 
-
-<!-- ═══════════════════════════ PORTFOLIO ═══════════════════════════ -->
-<section id="portfolio" style="padding:100px 24px;max-width:1200px;margin:0 auto">
-  <div class="reveal" style="text-align:center;margin-bottom:64px">
-    <div class="section-label" style="margin-bottom:12px"><span class="en">Case Studies</span><span class="fr">Études de Cas</span></div>
-    <h2 class="en" style="font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.04em;margin-bottom:16px">Real workflows.<br/><span style="color:#4B6580">Real results.</span></h2>
-    <h2 class="fr" style="font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.04em;margin-bottom:16px">Des workflows réels.<br/><span style="color:#4B6580">Des résultats concrets.</span></h2>
-    <p class="en" style="color:#4B6580;font-size:16px;max-width:500px;margin:0 auto">Three production systems, deployed and operational. Each built from a real client problem.</p>
-    <p class="fr" style="color:#4B6580;font-size:16px;max-width:500px;margin:0 auto">Trois systèmes en production, déployés et opérationnels. Chacun construit à partir d'un vrai problème client.</p>
-  </div>
-
-  <!-- CASE 1 — Real Estate -->
-  <div class="card reveal" style="padding:0;margin-bottom:24px;overflow:hidden">
-    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
-      <!-- Left: info -->
-      <div style="padding:40px 40px 40px;border-right:1px solid #1C2A38">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-          <span class="tag tag-cyan">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
-            <span class="en">Real Estate</span><span class="fr">Immobilier</span>
-          </span>
-          <span class="tag tag-blue">WhatsApp · NocoDB · Cloudinary</span>
-        </div>
-
-        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">AI Real Estate<br/>Lead Qualification Agent</h3>
-        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Agent IA de Qualification<br/>de Leads Immobiliers</h3>
-
-        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Elite Immo · WhatsApp Bot · Lead Gen</p>
-        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Elite Immo · Bot WhatsApp · Génération de leads</p>
-
-        <!-- Problem -->
-        <div style="margin-bottom:20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
-          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">Real estate agents spent hours manually answering the same WhatsApp questions: price, location, availability. High-intent leads were lost overnight when agents were offline, and there was no systematic way to capture prospect data.</p>
-          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">Les agents immobiliers passaient des heures à répondre manuellement aux mêmes questions WhatsApp. Les leads à forte intention étaient perdus la nuit, et il n'existait aucun moyen systématique de capturer les données des prospects.</p>
-        </div>
+    <div class="hero-right">
+      <div class="hero-stat-row">
+        <div class="hero-stat-num">24/7</div>
+        <div class="hero-stat-label"><span class="en">AI systems that never sleep</span><span class="fr">Systèmes IA qui ne dorment jamais</span></div>
       </div>
-
-      <!-- Right: solution + result -->
-      <div style="padding:40px">
-        <div style="margin-bottom:24px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
-
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">1</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Webhook Receiver:</strong> Captures every incoming WhatsApp message (text, audio, image) via WHAPI webhook and routes it through message-type detection.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Webhook:</strong> Capture chaque message WhatsApp entrant (texte, audio, image) via le webhook WHAPI avec détection du type de média.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">2</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">AI Agent + NocoDB:</strong> GPT-4o collects 3 criteria (type, zone, budget) then calls the NocoDB catalog API to find matching properties in real time. Zero hallucination — only real listings.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Agent IA + NocoDB:</strong> GPT-4o collecte 3 critères (type, zone, budget) puis interroge l'API NocoDB pour trouver des biens en temps réel. Zéro hallucination.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">3</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Cloudinary Bridge:</strong> Private S3 NocoDB images are downloaded via authenticated API, then re-uploaded to Cloudinary to generate a public URL — enabling WhatsApp image delivery.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Bridge Cloudinary:</strong> Les images S3 privées NocoDB sont téléchargées via API authentifiée, puis transférées vers Cloudinary pour générer une URL publique.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Result -->
-        <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:12px;padding:20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#10B981;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
-          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">Fully automated lead qualification 24/7. Prospects receive property photos, descriptions, and pricing in under 3 seconds. All qualified leads are auto-logged to Google Sheets. <strong style="color:#34D399">Agent response time: &lt; 3s. Zero human effort per lead.</strong></p>
-          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">Qualification automatique des leads 24h/24. Les prospects reçoivent photos, descriptions et prix en moins de 3 secondes. Tous les leads qualifiés sont enregistrés automatiquement dans Google Sheets. <strong style="color:#34D399">Temps de réponse : &lt; 3s. Zéro effort humain par lead.</strong></p>
-        </div>
+      <div class="hero-stat-row">
+        <div class="hero-stat-num" style="color:var(--accent)">95%</div>
+        <div class="hero-stat-label"><span class="en">Repetitive tasks eliminated per client</span><span class="fr">Tâches répétitives éliminées par client</span></div>
       </div>
-    </div>
-  </div>
-
-  <!-- CASE 2 — Healthcare -->
-  <div class="card reveal" style="padding:0;margin-bottom:24px;overflow:hidden">
-    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
-      <div style="padding:40px;border-right:1px solid #1C2A38">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-          <span class="tag tag-blue">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
-            <span class="en">Healthcare</span><span class="fr">Santé</span>
-          </span>
-          <span class="tag tag-cyan">Supabase · Google Calendar · OpenRouter</span>
-        </div>
-
-        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Clinical WhatsApp<br/>Appointment Assistant</h3>
-        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Assistant IA Clinique<br/>sur WhatsApp</h3>
-
-        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Clinique Divine Miséricorde · Medical Triage · Smart Scheduling</p>
-        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">Clinique Divine Miséricorde · Triage Médical · Planning Intelligent</p>
-
-        <div style="margin-bottom:0">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
-          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">The clinic's reception team was overwhelmed with WhatsApp booking messages — many arriving outside business hours. Symptom assessment was inconsistent, appointment reminders were manual, and there was no patient conversation history across sessions.</p>
-          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">L'équipe de la clinique était débordée par les messages WhatsApp — souvent en dehors des heures d'ouverture. L'évaluation des symptômes était incohérente, les rappels manuels, et il n'existait aucun historique des conversations par patient.</p>
-        </div>
+      <div class="hero-stat-row">
+        <div class="hero-stat-num">&lt;3s</div>
+        <div class="hero-stat-label"><span class="en">Average agent response time</span><span class="fr">Temps de réponse moyen des agents</span></div>
       </div>
-
-      <div style="padding:40px">
-        <div style="margin-bottom:24px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
-
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">1</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Persistent Memory (Supabase):</strong> Every conversation is stored with a patient profile. New vs. returning patients are detected automatically — eliminating "who are you?" questions.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Mémoire persistante (Supabase):</strong> Chaque conversation est stockée avec un profil patient. Les nouveaux vs anciens patients sont détectés automatiquement.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">2</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Medical Triage Engine:</strong> AI asks 3–4 adaptive symptom questions, scores urgency (low → urgent), logs to Supabase triage_cases, and alerts medical staff for high/urgent cases in real time.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Moteur de Triage Médical:</strong> L'IA pose 3–4 questions adaptées, évalue l'urgence (faible → urgente), enregistre dans Supabase et alerte le personnel médical en temps réel.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">3</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Smart Scheduler + Reminders:</strong> Google Calendar integration checks real availability, proposes 3 free slots, confirms instantly. A cron job sends WhatsApp reminders 30 min before each appointment.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Planificateur + Rappels:</strong> Intégration Google Calendar pour vérifier les disponibilités, proposer 3 créneaux libres, confirmer instantanément. Un cron envoie les rappels WhatsApp 30 min avant chaque RDV.</p>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:12px;padding:20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#60A5FA;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
-          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">Reception team workload cut by ~80%. Critical symptom cases are triaged and escalated before the patient even arrives. Appointment no-shows dropped significantly thanks to automated 30-min WhatsApp reminders. <strong style="color:#93C5FD">Full booking loop completed in under 2 minutes.</strong></p>
-          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">Charge de travail de l'accueil réduite de ~80%. Les cas critiques sont triés avant même l'arrivée du patient. Les rendez-vous manqués ont chuté grâce aux rappels WhatsApp automatiques. <strong style="color:#93C5FD">Cycle de réservation complet en moins de 2 minutes.</strong></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CASE 3 — CRM Nurturing -->
-  <div class="card reveal" style="padding:0;overflow:hidden">
-    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:360px">
-      <div style="padding:40px;border-right:1px solid #1C2A38">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-          <span class="tag tag-green">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
-            <span class="en">CRM / Sales</span><span class="fr">CRM / Ventes</span>
-          </span>
-          <span class="tag tag-cyan">Tally · Gemini · Google Sheets</span>
-        </div>
-
-        <h3 class="en" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Automated Prospect<br/>Nurturing Sequence</h3>
-        <h3 class="fr" style="font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;line-height:1.3">Séquence Automatisée<br/>de Suivi Prospects</h3>
-
-        <p class="en" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">FR IMMO · Email Nurturing · J+2 / J+7 / J+14 Sequences</p>
-        <p class="fr" style="color:#4B6580;font-size:13px;margin-bottom:28px;line-height:1.6">FR IMMO · Email Nurturing · Séquences J+2 / J+7 / J+14</p>
-
-        <div>
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:8px"><span class="en">The Problem</span><span class="fr">Le Problème</span></div>
-          <p class="en" style="font-size:14px;color:#94A3B8;line-height:1.6">After property visits, 70% of prospects were lost due to lack of follow-up. Sales agents had no bandwidth to send personalized emails manually. Without a CRM pipeline, hot leads cooled off within days and were never re-engaged.</p>
-          <p class="fr" style="font-size:14px;color:#94A3B8;line-height:1.6">Après les visites, 70% des prospects étaient perdus faute de suivi. Les agents n'avaient pas le temps d'envoyer des emails personnalisés manuellement. Sans pipeline CRM, les leads chauds refroidissaient en quelques jours.</p>
-        </div>
-      </div>
-
-      <div style="padding:40px">
-        <div style="margin-bottom:24px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0891B2;margin-bottom:12px"><span class="en">Technical Solution</span><span class="fr">Solution Technique</span></div>
-
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">1</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Tally Form Trigger:</strong> After each visit, agents fill a quick Tally form. Data (name, email, property, budget, status) is instantly logged to Google Sheets and the nurturing sequence begins.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Déclencheur Tally:</strong> Après chaque visite, les agents remplissent un formulaire Tally. Les données sont enregistrées dans Google Sheets et la séquence commence.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">2</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Gemini 2.5 Flash Copywriting:</strong> Each email is generated fresh by Gemini with full prospect context — J+2 warm follow-up, J+7 expert tips, J+14 urgency with soft scarcity. Markdown stripped, subject parsed automatically.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Rédaction Gemini 2.5 Flash:</strong> Chaque email est généré par Gemini avec le contexte complet du prospect — J+2 prise de nouvelles, J+7 conseils experts, J+14 urgence douce.</p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="step-num">3</div>
-              <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Smart Status Gate:</strong> Before each send, the workflow checks Google Sheets for status. If "Fermé" (won), the sequence stops. Managers receive a notification with a deep-link to the exact row to close leads manually.</p>
-              <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.55;padding-top:3px"><strong style="color:#F1F5F9">Porte de Statut Intelligente:</strong> Avant chaque envoi, le workflow vérifie le statut dans Google Sheets. Si "Fermé" (gagné), la séquence s'arrête. Les managers reçoivent une notification avec un lien direct vers la ligne.</p>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:12px;padding:20px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#10B981;margin-bottom:10px"><span class="en">The Result</span><span class="fr">Le Résultat</span></div>
-          <p class="en" style="font-size:13px;color:#94A3B8;line-height:1.6">3 personalized emails per prospect sent automatically at J+2, J+7, and J+14. Sales agents are notified only when human action is needed. Conversion pipeline fully automated. <strong style="color:#34D399">Zero email written manually. Sequence runs in perpetuity.</strong></p>
-          <p class="fr" style="font-size:13px;color:#94A3B8;line-height:1.6">3 emails personnalisés envoyés automatiquement à J+2, J+7 et J+14. Les agents ne sont notifiés que si une action humaine est nécessaire. <strong style="color:#34D399">Zéro email écrit manuellement. La séquence tourne indéfiniment.</strong></p>
-        </div>
+      <div class="hero-stat-row" style="border-bottom:none">
+        <div class="hero-stat-num" style="color:var(--green)">3+</div>
+        <div class="hero-stat-label"><span class="en">Industries shipped to production</span><span class="fr">Secteurs déployés en production</span></div>
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ═══════════════════════════ TECH STACK ═══════════════════════════ -->
-<section id="stack" style="padding:100px 24px;background:#070B10;border-top:1px solid #1C2A38;border-bottom:1px solid #1C2A38">
-  <div style="max-width:1100px;margin:0 auto">
-    <div class="reveal" style="text-align:center;margin-bottom:56px">
-      <div class="section-label" style="margin-bottom:12px"><span class="en">Technology</span><span class="fr">Technologies</span></div>
-      <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:12px">The stack behind<br/>every workflow</h2>
-      <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:12px">Le stack derrière<br/>chaque workflow</h2>
-      <p class="en" style="color:#4B6580;font-size:15px;max-width:460px;margin:0 auto">Battle-tested tools, integrated with surgical precision.</p>
-      <p class="fr" style="color:#4B6580;font-size:15px;max-width:460px;margin:0 auto">Des outils éprouvés, intégrés avec précision chirurgicale.</p>
-    </div>
+<!-- ════ MARQUEE ═══════════════════════════════════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mq">
+    <!-- filled by JS -->
+  </div>
+</div>
 
-    <!-- Automation -->
-    <div class="reveal" style="margin-bottom:40px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">Automation & Orchestration</span><span class="fr">Automatisation & Orchestration</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#FF6C37;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/><circle cx="12" cy="12" r="3" fill="white"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">n8n</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Workflow Engine</span><span class="fr">Moteur Workflows</span></div>
-          </div>
+
+<!-- ════ PORTFOLIO ═════════════════════════════════ -->
+<section id="portfolio" style="padding:80px 0 0">
+  <div class="container">
+    <div class="sh reveal">
+      <p class="label en">Selected Work</p>
+      <p class="label fr">Travaux Sélectionnés</p>
+      <h2 class="sh-title en">Three systems.<br/>Real outcomes.</h2>
+      <h2 class="sh-title fr">Trois systèmes.<br/>Des résultats réels.</h2>
+      <p class="sh-sub en">Each case study is a production workflow — not a demo. Built for real clients, deployed, and running autonomously right now.</p>
+      <p class="sh-sub fr">Chaque étude de cas est un workflow en production — pas une démo. Construit pour de vrais clients, déployé et tournant de manière autonome en ce moment.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="cases">
+
+    <!-- ── CASE 01 ── Real Estate ── -->
+    <div class="case container reveal">
+      <div class="case-num">01 /</div>
+      <div class="case-meta">
+        <div class="case-tags">
+          <span class="tag tag-o"><span class="en">Real Estate</span><span class="fr">Immobilier</span></span>
+          <span class="tag tag-b">WhatsApp</span>
+          <span class="tag tag-b">NocoDB</span>
+          <span class="tag tag-b">Cloudinary</span>
+          <span class="tag tag-b">GPT-4o</span>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Make</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Visual Automation</span><span class="fr">Automatisation Visuelle</span></div>
-          </div>
+        <h3 class="case-title en">AI Real Estate<br/>Lead Qualification Agent</h3>
+        <h3 class="case-title fr">Agent IA de Qualification<br/>de Leads Immobiliers</h3>
+        <p class="case-sub">Elite Immo — WhatsApp Automation</p>
+
+        <div class="case-block">
+          <p class="case-block-label en">The Problem</p>
+          <p class="case-block-label fr">Le Problème</p>
+          <p class="case-block-text en">Agents spent 3+ hours/day answering the same WhatsApp questions: price, location, availability. High-intent leads disappeared overnight when agents went offline. There was no systematic capture of prospect data, and property photos couldn't be served through WhatsApp due to private S3 storage.</p>
+          <p class="case-block-text fr">Les agents passaient 3h+ par jour à répondre aux mêmes questions WhatsApp. Les leads à forte intention disparaissaient la nuit. Aucune capture systématique des données, et les photos de biens ne pouvaient pas être envoyées sur WhatsApp à cause du stockage S3 privé.</p>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.101-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.293-.524.066-.601.33-.8.242-.175.485-.449.728-.675.213-.21.274-.362.25-.599-.025-.223-.364-1.476-.497-2.023-.136-.584-.282-.505-.474-.515-.167-.007-.341-.009-.516-.009-.171 0-.448.064-.683.324-.232.26-.886.866-.886 2.12s.908 2.461 1.034 2.63c.128.165 1.797 2.733 4.349 3.835.608.261 1.083.415 1.452.53.61.194 1.165.167 1.605.101.49-.073 1.493-.613 1.704-1.204.21-.586.21-1.088.148-1.19-.064-.101-.243-.15-.51-.3z"/><path d="M12 2.163c-5.435 0-9.856 4.412-9.856 9.837 0 1.735.453 3.358 1.244 4.762L2 22l5.34-1.402A9.756 9.756 0 0012 22c5.435 0 9.856-4.413 9.856-9.838C21.856 6.575 17.435 2.163 12 2.163z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">WhatsApp</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Messaging Channel</span><span class="fr">Canal de Messagerie</span></div>
-          </div>
+
+        <div class="case-result">
+          <p class="case-result-label en">The Result</p>
+          <p class="case-result-label fr">Le Résultat</p>
+          <p class="case-result-text en">Automated lead qualification 24/7. Prospects get property photos, pricing and descriptions in <strong>under 3 seconds</strong>. All qualified leads auto-logged to Google Sheets. <strong>Zero human effort per lead. Zero missed inquiry.</strong></p>
+          <p class="case-result-text fr">Qualification automatique des leads 24h/24. Les prospects reçoivent photos, prix et descriptions en <strong>moins de 3 secondes</strong>. Tous les leads qualifiés enregistrés automatiquement dans Google Sheets. <strong>Zéro effort humain par lead. Zéro demande manquée.</strong></p>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#1A73E8;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Google Suite</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Sheets, Calendar, Gmail</span><span class="fr">Sheets, Agenda, Gmail</span></div>
-          </div>
+      </div>
+
+      <div class="case-steps">
+        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
+        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
+        <div class="step">
+          <div class="step-n">1</div>
+          <p class="step-text en"><strong>Webhook Receiver (WHAPI):</strong> Captures every WhatsApp message — text, audio transcribed by Whisper, images analyzed by GPT-4o Vision — and routes each to the right processing branch.</p>
+          <p class="step-text fr"><strong>Webhook WHAPI:</strong> Capture chaque message WhatsApp — texte, audio transcrit par Whisper, images analysées par GPT-4o Vision — et route chacun vers la bonne branche.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <p class="step-text en"><strong>AI Agent + NocoDB catalog:</strong> GPT-4o collects 3 criteria (property type, zone, budget) via conversational memory, then queries the NocoDB API in real time. Strict anti-hallucination rules — only real listings are presented.</p>
+          <p class="step-text fr"><strong>Agent IA + Catalogue NocoDB:</strong> GPT-4o collecte 3 critères via mémoire conversationnelle, puis interroge l'API NocoDB en temps réel. Règles anti-hallucination strictes — uniquement des biens réels.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <p class="step-text en"><strong>Cloudinary Bridge (the hard part):</strong> NocoDB images live on private Amazon S3. n8n authenticates with the NocoDB API, downloads the binary file, and re-uploads it to Cloudinary — generating a public URL that WhatsApp can display. No URL forwarding, no 403 errors.</p>
+          <p class="step-text fr"><strong>Bridge Cloudinary:</strong> Les images NocoDB sont sur S3 privé. n8n s'authentifie, télécharge le fichier binaire et le transfère vers Cloudinary — générant une URL publique affichable sur WhatsApp. Sans redirection d'URL, sans erreur 403.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <p class="step-text en"><strong>Google Sheets CRM:</strong> Once a qualified lead gives their name, the AI agent auto-appends a row with: name, WhatsApp number, property type, zone, budget, and qualification status.</p>
+          <p class="step-text fr"><strong>CRM Google Sheets:</strong> Une fois qualifié, l'agent IA enregistre automatiquement : nom, numéro WhatsApp, type de bien, zone, budget et statut de qualification.</p>
         </div>
       </div>
     </div>
 
-    <!-- AI -->
-    <div class="reveal" style="margin-bottom:40px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">AI & Language Models</span><span class="fr">IA & Modèles de Langage</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#10A37F;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">OpenAI GPT-4o</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Reasoning + Vision</span><span class="fr">Raisonnement + Vision</span></div>
-          </div>
+    <!-- ── CASE 02 ── Healthcare ── -->
+    <div class="case container reveal">
+      <div class="case-num">02 /</div>
+      <div class="case-meta">
+        <div class="case-tags">
+          <span class="tag tag-b"><span class="en">Healthcare</span><span class="fr">Santé</span></span>
+          <span class="tag tag-b">Supabase</span>
+          <span class="tag tag-b">Google Calendar</span>
+          <span class="tag tag-b">GPT-4o mini</span>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#4285F4,#34A853,#FBBC05,#EA4335);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Gemini 2.5 Flash</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Copywriting & Analysis</span><span class="fr">Rédaction & Analyse</span></div>
-          </div>
+        <h3 class="case-title en">Clinical WhatsApp<br/>Appointment &amp; Triage AI</h3>
+        <h3 class="case-title fr">Assistant IA Clinique —<br/>Prise de RDV &amp; Triage Médical</h3>
+        <p class="case-sub">Clinique Divine Miséricorde — Full Patient Automation</p>
+
+        <div class="case-block">
+          <p class="case-block-label en">The Problem</p>
+          <p class="case-block-label fr">Le Problème</p>
+          <p class="case-block-text en">The reception team was overwhelmed handling WhatsApp bookings outside business hours. Symptom assessment was ad hoc and inconsistent. Appointment reminders were sent manually — and often forgotten. Patient data was never persisted across conversations, forcing patients to repeat themselves every time.</p>
+          <p class="case-block-text fr">L'équipe d'accueil était submergée par les messages WhatsApp hors horaires. L'évaluation des symptômes était aléatoire. Les rappels de RDV étaient manuels et souvent oubliés. Les données patients n'étaient pas conservées entre les conversations, forçant les patients à tout répéter.</p>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#FF6B6B;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">OpenRouter</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">LLM Gateway</span><span class="fr">Passerelle LLM</span></div>
-          </div>
+
+        <div class="case-result">
+          <p class="case-result-label en">The Result</p>
+          <p class="case-result-label fr">Le Résultat</p>
+          <p class="case-result-text en">Reception workload cut by ~80%. Critical cases are triaged and escalated before the patient arrives. No-show rate dropped significantly with automated 30-min WhatsApp reminders. <strong>Full booking loop completed in under 2 minutes. System runs 24/7 with no human involved.</strong></p>
+          <p class="case-result-text fr">Charge de travail de l'accueil réduite de ~80%. Les cas critiques sont triés avant l'arrivée du patient. Taux d'absence réduit grâce aux rappels automatiques. <strong>Cycle de réservation complet en moins de 2 minutes. Le système tourne 24h/24 sans intervention humaine.</strong></p>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#CC785C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 18.5c3.5-3 7-5.5 7-10a7 7 0 0 0-14 0c0 4.5 3.5 7 7 10z"/><circle cx="12" cy="10" r="2" fill="white" stroke="none"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Claude API</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Anthropic Models</span><span class="fr">Modèles Anthropic</span></div>
-          </div>
+      </div>
+
+      <div class="case-steps">
+        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
+        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
+        <div class="step">
+          <div class="step-n">1</div>
+          <p class="step-text en"><strong>Persistent Patient Memory (Supabase):</strong> Every conversation is stored with a full patient profile. New vs. returning patients are auto-detected — no more "who are you?" every time. The last 15 messages feed the AI as context.</p>
+          <p class="step-text fr"><strong>Mémoire Patient Persistante (Supabase):</strong> Chaque conversation est stockée avec un profil complet. Nouveau vs ancien patient détecté automatiquement. Les 15 derniers messages alimentent l'IA en contexte.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <p class="step-text en"><strong>Adaptive Medical Triage Engine:</strong> AI asks 3–4 adaptive questions based on symptom type (pain: 4 questions including intensity; nausea/fever: 3 questions). Urgency scored low → urgent. Staff alerted instantly for high/urgent cases. Suicidal or vital emergencies → "Call 15 NOW".</p>
+          <p class="step-text fr"><strong>Moteur de Triage Médical Adaptatif:</strong> L'IA pose 3–4 questions selon le type de symptôme. Urgence évaluée de faible à urgente. Le personnel est alerté immédiatement pour les cas critiques.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <p class="step-text en"><strong>Smart Calendar Scheduler:</strong> Google Calendar checked for real availability (not cached). Agent proposes 3 free slots, patient confirms one, event created instantly with motif and contact info embedded in the description.</p>
+          <p class="step-text fr"><strong>Planificateur Google Calendar:</strong> Disponibilités vérifiées en temps réel. L'agent propose 3 créneaux libres, le patient en choisit un, l'événement est créé instantanément avec motif et coordonnées.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <p class="step-text en"><strong>30-min Reminder Cron:</strong> A scheduler runs every 5 minutes, fetches appointments in the 25–35 min window, sends a WhatsApp reminder to the patient AND a notification to the clinic. The calendar event is then updated with "✅ Reminder sent."</p>
+          <p class="step-text fr"><strong>Cron de Rappel 30 min:</strong> Un scheduler tourne toutes les 5 min, récupère les RDV dans la fenêtre 25–35 min, envoie un rappel WhatsApp au patient ET une notification à la clinique.</p>
         </div>
       </div>
     </div>
 
-    <!-- Data -->
-    <div class="reveal">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4B6580;margin-bottom:16px"><span class="en">Data & Storage</span><span class="fr">Données & Stockage</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#1B9C3E;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><ellipse cx="12" cy="6" rx="9" ry="3"/><path d="M3 6v6c0 1.66 4.03 3 9 3s9-1.34 9-3V6"/><path d="M3 12v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>
+    <!-- ── CASE 03 ── CRM Nurturing ── -->
+    <div class="case container reveal">
+      <div class="case-num">03 /</div>
+      <div class="case-meta">
+        <div class="case-tags">
+          <span class="tag tag-g"><span class="en">CRM / Sales</span><span class="fr">CRM / Ventes</span></span>
+          <span class="tag tag-b">Tally</span>
+          <span class="tag tag-b">Gemini 2.5</span>
+          <span class="tag tag-b">Google Sheets</span>
+          <span class="tag tag-b">Gmail</span>
+        </div>
+        <h3 class="case-title en">AI-Written Prospect<br/>Nurturing Sequence</h3>
+        <h3 class="case-title fr">Séquence de Nurturing<br/>Rédigée par IA</h3>
+        <p class="case-sub">FR IMMO — J+2 / J+7 / J+14 Email Automation</p>
+
+        <div class="case-block">
+          <p class="case-block-label en">The Problem</p>
+          <p class="case-block-label fr">Le Problème</p>
+          <p class="case-block-text en">70% of post-visit prospects were lost due to zero follow-up. Agents had no time to write personalized emails. Without a pipeline, hot leads cooled within days. There was no signal when a prospect had already converted, causing awkward re-engagement emails to closed deals.</p>
+          <p class="case-block-text fr">70% des prospects après visite étaient perdus faute de suivi. Les agents n'avaient pas le temps d'écrire des emails personnalisés. Sans pipeline, les leads chauds refroidissaient en quelques jours. Aucun signal quand un prospect avait déjà signé.</p>
+        </div>
+
+        <div class="case-result">
+          <p class="case-result-label en">The Result</p>
+          <p class="case-result-label fr">Le Résultat</p>
+          <p class="case-result-text en">3 fully personalized emails per prospect, auto-sent at J+2, J+7, J+14. Agents notified only when a human response is needed — with a direct Google Sheets deep-link. <strong>Zero emails written manually. Sequence runs in perpetuity. Closed deals automatically gated out.</strong></p>
+          <p class="case-result-text fr">3 emails entièrement personnalisés par prospect, envoyés automatiquement à J+2, J+7 et J+14. Agents notifiés uniquement quand une intervention humaine est nécessaire. <strong>Zéro email écrit manuellement. Séquence infinie. Les deals fermés sont automatiquement exclus.</strong></p>
+        </div>
+      </div>
+
+      <div class="case-steps">
+        <p class="label en" style="margin-bottom:8px">Technical Solution</p>
+        <p class="label fr" style="margin-bottom:8px">Solution Technique</p>
+        <div class="step">
+          <div class="step-n">1</div>
+          <p class="step-text en"><strong>Tally Form → Google Sheets Trigger:</strong> After each visit, agent fills a Tally form (name, email, property, budget, visit date, status). Data written to Google Sheets in real time. Only prospects with status "Réfléchi" enter the nurturing sequence.</p>
+          <p class="step-text fr"><strong>Formulaire Tally → Déclencheur Google Sheets:</strong> Après chaque visite, l'agent remplit un formulaire Tally. Données écrites dans Google Sheets en temps réel. Seuls les prospects avec le statut "Réfléchi" entrent dans la séquence.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <p class="step-text en"><strong>Gemini 2.5 Flash Copywriting:</strong> Each email generated fresh — full prospect context injected. J+2 = warm check-in, no pressure. J+7 = 3 practical buying tips, property subtly mentioned. J+14 = gentle urgency, "other buyers are looking," 10-minute call offer. Markdown asterisks stripped automatically via code node.</p>
+          <p class="step-text fr"><strong>Rédaction Gemini 2.5 Flash:</strong> Chaque email généré fraîchement avec le contexte complet. J+2 = prise de nouvelles, sans pression. J+7 = 3 conseils pratiques, bien mentionné subtilement. J+14 = urgence douce, offre d'appel de 10 minutes.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <p class="step-text en"><strong>Smart Status Gate:</strong> Before every send, the workflow re-reads the Google Sheets row. If status is "Fermé" (deal closed), the entire remaining sequence stops — no awkward emails to won clients. Managers get a Gmail notification with a direct deep-link to the exact row.</p>
+          <p class="step-text fr"><strong>Porte de Statut Intelligente:</strong> Avant chaque envoi, le workflow relit la ligne Google Sheets. Si le statut est "Fermé", toute la séquence restante s'arrête. Les managers reçoivent un email avec un lien direct vers la ligne exacte.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cases -->
+</section>
+
+
+<!-- ════ STACK ═══════════════════════════════════════ -->
+<section id="stack" class="stack-section">
+  <div class="container">
+    <div class="sh reveal">
+      <p class="label en">Technology</p>
+      <p class="label fr">Technologies</p>
+      <h2 class="sh-title en">Every tool, chosen<br/>for a reason.</h2>
+      <h2 class="sh-title fr">Chaque outil, choisi<br/>pour une raison.</h2>
+      <p class="sh-sub en">No bloat. No vendor lock-in. Each technology selected because it genuinely outperforms the alternatives for that specific job.</p>
+      <p class="sh-sub fr">Aucun outil superflu. Aucun verrouillage propriétaire. Chaque technologie choisie parce qu'elle surpasse les alternatives pour ce travail spécifique.</p>
+    </div>
+
+    <div class="stack-grid reveal">
+      <div class="stack-cell">
+        <p class="stack-cat"><span class="en">Orchestration</span><span class="fr">Orchestration</span></p>
+        <div class="stack-item"><div class="stack-dot" style="background:#FF6C37"></div><div><div class="stack-name">n8n</div><div class="stack-desc"><span class="en">Workflow engine</span><span class="fr">Moteur de workflow</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#A855F7"></div><div><div class="stack-name">Make</div><div class="stack-desc"><span class="en">Visual automation</span><span class="fr">Automatisation visuelle</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:var(--dim)"></div><div><div class="stack-name">Webhooks</div><div class="stack-desc"><span class="en">Event triggers</span><span class="fr">Déclencheurs d'événements</span></div></div></div>
+      </div>
+      <div class="stack-cell">
+        <p class="stack-cat"><span class="en">AI Models</span><span class="fr">Modèles IA</span></p>
+        <div class="stack-item"><div class="stack-dot" style="background:#10A37F"></div><div><div class="stack-name">GPT-4o</div><div class="stack-desc"><span class="en">Reasoning + vision</span><span class="fr">Raisonnement + vision</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#4285F4"></div><div><div class="stack-name">Gemini 2.5</div><div class="stack-desc"><span class="en">Copywriting</span><span class="fr">Rédaction</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#CC785C"></div><div><div class="stack-name">Claude API</div><div class="stack-desc"><span class="en">Complex reasoning</span><span class="fr">Raisonnement complexe</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:var(--dim)"></div><div><div class="stack-name">OpenRouter</div><div class="stack-desc"><span class="en">LLM gateway</span><span class="fr">Passerelle LLM</span></div></div></div>
+      </div>
+      <div class="stack-cell">
+        <p class="stack-cat"><span class="en">Data & Storage</span><span class="fr">Données & Stockage</span></p>
+        <div class="stack-item"><div class="stack-dot" style="background:#1B9C3E"></div><div><div class="stack-name">NocoDB</div><div class="stack-desc"><span class="en">No-code database</span><span class="fr">Base no-code</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#3ECF8E"></div><div><div class="stack-name">Supabase</div><div class="stack-desc"><span class="en">Realtime Postgres</span><span class="fr">Postgres temps réel</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#18BFFF"></div><div><div class="stack-name">Airtable</div><div class="stack-desc"><span class="en">Flexible CRM base</span><span class="fr">Base CRM flexible</span></div></div></div>
+      </div>
+      <div class="stack-cell">
+        <p class="stack-cat"><span class="en">Communication & Media</span><span class="fr">Communication & Médias</span></p>
+        <div class="stack-item"><div class="stack-dot" style="background:#25D366"></div><div><div class="stack-name">WhatsApp API</div><div class="stack-desc"><span class="en">Messaging channel</span><span class="fr">Canal de messagerie</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#F6821F"></div><div><div class="stack-name">Cloudinary</div><div class="stack-desc"><span class="en">Public media CDN</span><span class="fr">CDN médias publics</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#EA4335"></div><div><div class="stack-name">Gmail / Sheets</div><div class="stack-desc"><span class="en">Google workspace</span><span class="fr">Suite Google</span></div></div></div>
+        <div class="stack-item"><div class="stack-dot" style="background:#3776AB"></div><div><div class="stack-name">Python</div><div class="stack-desc"><span class="en">Custom scripts</span><span class="fr">Scripts personnalisés</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ PROCESS ════════════════════════════════════ -->
+<section id="process">
+  <div class="container">
+    <div class="sh reveal">
+      <p class="label en">How We Work</p>
+      <p class="label fr">Notre Méthode</p>
+      <h2 class="sh-title en">From idea to<br/>running in production.</h2>
+      <h2 class="sh-title fr">De l'idée au<br/>système en production.</h2>
+    </div>
+
+    <div class="process-steps reveal">
+      <div class="p-step">
+        <div class="p-step-top">
+          <div class="p-step-circle active">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">NocoDB</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">No-Code Database</span><span class="fr">Base de Données No-Code</span></div>
+          <span class="p-step-n">01</span>
+        </div>
+        <p class="p-step-title en">Discovery</p>
+        <p class="p-step-title fr">Découverte</p>
+        <p class="p-step-text en">We map your current process, identify the highest-ROI automation points, and scope the build. Async — no lengthy meetings required.</p>
+        <p class="p-step-text fr">On cartographie votre processus, identifie les points d'automatisation à fort ROI et cadrons le projet. Entièrement async.</p>
+      </div>
+      <div class="p-step">
+        <div class="p-step-top">
+          <div class="p-step-circle">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <span class="p-step-n">02</span>
+        </div>
+        <p class="p-step-title en">Architecture</p>
+        <p class="p-step-title fr">Architecture</p>
+        <p class="p-step-text en">Workflow design, API mapping, edge case planning. We document every decision before writing a single node.</p>
+        <p class="p-step-text fr">Design du workflow, mapping des API, planification des cas limites. On documente chaque décision avant d'écrire un seul nœud.</p>
+      </div>
+      <div class="p-step">
+        <div class="p-step-top">
+          <div class="p-step-circle">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M4 12l3-3 2 2 3-4" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="p-step-n">03</span>
+        </div>
+        <p class="p-step-title en">Build & Test</p>
+        <p class="p-step-title fr">Développement & Tests</p>
+        <p class="p-step-text en">Build, stress-test, then deploy. You get a Loom walkthrough + full documentation so your team owns the system completely.</p>
+        <p class="p-step-text fr">Construction, tests de charge, déploiement. Vous recevez un Loom de présentation et une documentation complète.</p>
+      </div>
+      <div class="p-step">
+        <div class="p-step-top">
+          <div class="p-step-circle">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6 2.7-6 6-6zm0 3v3l2 2" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <span class="p-step-n">04</span>
+        </div>
+        <p class="p-step-title en">Async Support</p>
+        <p class="p-step-title fr">Support Async</p>
+        <p class="p-step-text en">All communication via email, Slack, or WhatsApp. We operate globally — no timezone friction, no retainer required.</p>
+        <p class="p-step-text fr">Toute communication par email, Slack ou WhatsApp. On opère à l'international — aucun problème de fuseau horaire.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ CONTACT ════════════════════════════════════ -->
+<section id="contact" style="background:var(--faint);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="contact-grid reveal">
+      <div class="contact-left">
+        <p class="label" style="margin-bottom:24px"><span class="en">Start a Project</span><span class="fr">Démarrer un Projet</span></p>
+
+        <p class="contact-quote en">
+          "The best automation is the one your team<br/>
+          <em>never has to think about.</em>"
+        </p>
+        <p class="contact-quote fr">
+          "La meilleure automatisation est celle<br/>
+          à laquelle votre équipe <em>ne pense jamais.</em>"
+        </p>
+
+        <div class="contact-attrs">
+          <div class="contact-attr">
+            <div class="contact-attr-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2.5v3l2 2" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <span class="en">Response within 24 hours via email</span>
+            <span class="fr">Réponse en 24h par email</span>
+          </div>
+          <div class="contact-attr">
+            <div class="contact-attr-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M1.5 7a5.5 5.5 0 1 0 11 0 5.5 5.5 0 0 0-11 0zm4-2.5l4 2.5-4 2.5V4.5z" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span class="en">Free 30-min workflow audit for new clients</span>
+            <span class="fr">Audit workflow gratuit de 30 min pour les nouveaux clients</span>
+          </div>
+          <div class="contact-attr">
+            <div class="contact-attr-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="var(--dim)" stroke-width="1.4"/><path d="M4.5 7h5M7 4.5v5" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <span class="en">English &amp; French — USA, Europe, Africa</span>
+            <span class="fr">Anglais &amp; Français — USA, Europe, Afrique</span>
+          </div>
+          <div class="contact-attr">
+            <div class="contact-attr-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 8.5A1.5 1.5 0 1 0 7 5.5a1.5 1.5 0 0 0 0 3zm0 0v2m-3-6a3 3 0 1 1 6 0" stroke="var(--dim)" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <span class="en">All communication async — no Zoom required</span>
+            <span class="fr">Toute communication async — sans visioconférence obligatoire</span>
           </div>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#3ECF8E;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1a1a1a"><path d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C.111 12.888.706 14.09 1.771 14.09h9.181l-.012 9.877c.015.987 1.26 1.41 1.874.637l9.262-11.649c.654-.837.059-2.041-.996-2.041l-9.181-.001.012-9.877z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Supabase</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Realtime Postgres</span><span class="fr">Postgres Temps Réel</span></div>
-          </div>
+
+        <div style="padding:20px 22px;background:#111009;border:1px solid var(--border);border-radius:8px">
+          <p class="label" style="margin-bottom:10px"><span class="en">Direct contact</span><span class="fr">Contact direct</span></p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--paper);margin-bottom:4px">hello@flowscale.agency</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--dim)">Upwork: <span style="color:var(--accent)">Sabi G.</span></p>
         </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#3448C5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6" stroke="#3448C5" stroke-width="2" fill="none"/></svg>
+      </div>
+
+      <div class="contact-right">
+        <form class="form" id="cform" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <div class="field">
+              <label><span class="en">Full Name</span><span class="fr">Nom Complet</span></label>
+              <input type="text" name="name" required placeholder="John Smith"/>
+            </div>
+            <div class="field">
+              <label><span class="en">Email</span><span class="fr">Email</span></label>
+              <input type="email" name="email" required placeholder="john@company.com"/>
+            </div>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Airtable</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Flexible CRM Base</span><span class="fr">Base CRM Flexible</span></div>
+          <div class="field">
+            <label><span class="en">Company / Project</span><span class="fr">Entreprise / Projet</span></label>
+            <input type="text" name="company" placeholder="Acme Corp"/>
           </div>
-        </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#F6821F;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-11h2v2h-2zm0 4h2v4h-2z"/></svg>
+          <div class="field">
+            <label><span class="en">Industry</span><span class="fr">Secteur</span></label>
+            <select name="industry">
+              <option value="">— <span class="en">Select</span><span class="fr">Choisir</span> —</option>
+              <option>Real Estate / Immobilier</option>
+              <option>Healthcare / Santé</option>
+              <option>E-Commerce</option>
+              <option>SaaS / Tech</option>
+              <option>Finance</option>
+              <option>Agency / Marketing</option>
+              <option>Other / Autre</option>
+            </select>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Cloudinary</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Media CDN</span><span class="fr">CDN Médias</span></div>
+          <div class="field">
+            <label><span class="en">What do you want to automate?</span><span class="fr">Qu'est-ce que vous voulez automatiser ?</span></label>
+            <textarea name="message" required placeholder="e.g. Our lead qualification takes 3 hours/day and we want AI to handle it…"></textarea>
           </div>
-        </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#3776AB;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l8 4V12l-8 4-8-4V8.18l8-4zM4 13.82L12 18l8-4.18V17l-8 4-8-4v-3.18z"/></svg>
+          <div class="check-row">
+            <input type="checkbox" name="consent" required id="chk"/>
+            <label for="chk"><span class="en">I agree to be contacted by Flowscale regarding my project.</span><span class="fr">J'accepte d'être contacté par Flowscale concernant mon projet.</span></label>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Python</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Custom Scripts</span><span class="fr">Scripts Personnalisés</span></div>
+          <button type="submit" class="submit-btn" id="sbtn">
+            <span id="sbtxt-en" class="en">Send Message</span>
+            <span id="sbtxt-fr" class="fr">Envoyer le Message</span>
+            <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M2 7.5h11M7.5 2l5.5 5.5-5.5 5.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+        <div class="success-box" id="sbox">
+          <div class="success-icon">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-        </div>
-        <div class="tech-pill">
-          <div style="width:36px;height:36px;border-radius:8px;background:#191919;border:1px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M9 4L3 12l6 8M15 4l6 8-6 8M14 4l-4 16"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#F1F5F9">Webhooks</div>
-            <div style="font-size:11px;color:#4B6580"><span class="en">Event Triggers</span><span class="fr">Déclencheurs Événements</span></div>
-          </div>
+          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--paper)" class="en">Message sent.</p>
+          <p style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--paper)" class="fr">Message envoyé.</p>
+          <p style="font-size:14px;color:var(--dim)" class="en">We'll reply within 24 hours.</p>
+          <p style="font-size:14px;color:var(--dim)" class="fr">Nous répondrons dans les 24 heures.</p>
         </div>
       </div>
     </div>
@@ -538,228 +929,105 @@
 </section>
 
 
-<!-- ═══════════════════════════ HOW WE WORK ═══════════════════════════ -->
-<section style="padding:100px 24px;max-width:900px;margin:0 auto">
-  <div class="reveal" style="text-align:center;margin-bottom:56px">
-    <div class="section-label" style="margin-bottom:12px"><span class="en">Process</span><span class="fr">Processus</span></div>
-    <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em">How we deliver</h2>
-    <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em">Notre méthode de livraison</h2>
-  </div>
-
-  <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:#1C2A38;border-radius:16px;overflow:hidden">
-    <div style="background:#0D1117;padding:32px 28px">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">01 —</div>
-      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Discovery Call</span><span class="fr">Appel de Découverte</span></div>
-      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">We map your current process, identify the highest-ROI automation opportunities, and scope the project.</p>
-      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">On cartographie votre processus actuel, identifie les opportunités d'automatisation à fort ROI et cadrons le projet.</p>
-    </div>
-    <div style="background:#0D1117;padding:32px 28px">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">02 —</div>
-      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Design & Build</span><span class="fr">Conception & Développement</span></div>
-      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">We design the workflow architecture, build each node, connect every API, and stress-test edge cases.</p>
-      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">On conçoit l'architecture, construit chaque nœud, connecte chaque API et teste les cas limites.</p>
-    </div>
-    <div style="background:#0D1117;padding:32px 28px">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">03 —</div>
-      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Deploy & Handoff</span><span class="fr">Déploiement & Transfert</span></div>
-      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">Live deployment, full documentation, and a Loom walkthrough so your team owns the system completely.</p>
-      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">Déploiement en production, documentation complète et walkthrough vidéo pour que votre équipe maîtrise le système.</p>
-    </div>
-    <div style="background:#0D1117;padding:32px 28px">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#0891B2;margin-bottom:16px">04 —</div>
-      <div style="font-size:15px;font-weight:600;color:#F1F5F9;margin-bottom:10px"><span class="en">Async Support</span><span class="fr">Support Asynchrone</span></div>
-      <p class="en" style="font-size:13px;color:#4B6580;line-height:1.6">All communication is async via email, Slack, or WhatsApp. No timezone friction. We work globally.</p>
-      <p class="fr" style="font-size:13px;color:#4B6580;line-height:1.6">Toute communication est async par email, Slack ou WhatsApp. Aucun problème de fuseau horaire. On travaille à l'international.</p>
-    </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════ CONTACT ═══════════════════════════ -->
-<section id="contact" style="padding:100px 24px;background:#070B10;border-top:1px solid #1C2A38;position:relative;overflow:hidden">
-  <div style="position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,.05) 0%,transparent 70%);pointer-events:none"></div>
-
-  <div style="max-width:640px;margin:0 auto;position:relative;z-index:1">
-    <div class="reveal" style="text-align:center;margin-bottom:48px">
-      <div class="section-label" style="margin-bottom:12px"><span class="en">Get in Touch</span><span class="fr">Contactez-nous</span></div>
-      <h2 class="en" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:14px">Ready to automate<br/><span style="color:#22D3EE">your first workflow?</span></h2>
-      <h2 class="fr" style="font-size:clamp(26px,4vw,44px);font-weight:700;letter-spacing:-.04em;margin-bottom:14px">Prêt à automatiser<br/><span style="color:#22D3EE">votre premier workflow ?</span></h2>
-      <p class="en" style="color:#4B6580;font-size:15px;line-height:1.6">Send us a message. We respond within 24 hours via email. All communication is in English or French.</p>
-      <p class="fr" style="color:#4B6580;font-size:15px;line-height:1.6">Envoyez-nous un message. Nous répondons dans les 24 heures par email. Toute communication en anglais ou en français.</p>
-    </div>
-
-    <div class="card reveal" style="padding:40px">
-      <form id="contact-form" onsubmit="handleSubmit(event)" style="display:flex;flex-direction:column;gap:20px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div>
-            <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Full Name</span><span class="fr">Nom Complet</span></label>
-            <input type="text" name="name" required class="input-field" placeholder="John Smith" />
-          </div>
-          <div>
-            <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Email Address</span><span class="fr">Adresse Email</span></label>
-            <input type="email" name="email" required class="input-field" placeholder="john@company.com" />
-          </div>
+<!-- ════ FOOTER ══════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8.5h3.5L7 4l2 8 2-4.5H14" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
+        <span style="font-weight:800;font-size:14px">Flowscale</span>
+        <span style="font-size:12px;color:var(--dim);font-family:var(--mono)">© 2025</span>
+      </div>
 
-        <div>
-          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Company / Project</span><span class="fr">Entreprise / Projet</span></label>
-          <input type="text" name="company" class="input-field" placeholder="Acme Corp" />
-        </div>
+      <div class="footer-status">
+        <div class="status-dot"></div>
+        <span style="font-size:12px;color:var(--dim);font-family:var(--mono)">
+          <span class="en">Available for new projects</span>
+          <span class="fr">Disponible pour de nouveaux projets</span>
+        </span>
+      </div>
 
-        <div>
-          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">Industry</span><span class="fr">Secteur d'activité</span></label>
-          <select name="industry" class="input-field" style="cursor:pointer;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234B6580' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 16px center">
-            <option value="" style="background:#0D1117">
-              <span class="en">Select industry…</span><span class="fr">Choisir le secteur…</span>
-            </option>
-            <option value="real_estate" style="background:#0D1117">Real Estate / Immobilier</option>
-            <option value="healthcare" style="background:#0D1117">Healthcare / Santé</option>
-            <option value="ecommerce" style="background:#0D1117">E-Commerce</option>
-            <option value="saas" style="background:#0D1117">SaaS / Tech</option>
-            <option value="finance" style="background:#0D1117">Finance</option>
-            <option value="agency" style="background:#0D1117">Agency / Marketing</option>
-            <option value="other" style="background:#0D1117">Other / Autre</option>
-          </select>
-        </div>
-
-        <div>
-          <label style="display:block;font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:8px"><span class="en">What do you want to automate?</span><span class="fr">Qu'est-ce que vous souhaitez automatiser ?</span></label>
-          <textarea name="message" required class="input-field" rows="4" style="resize:vertical;min-height:100px" placeholder="e.g., Our lead qualification process takes 3 hours/day and we want to automate it with AI…"></textarea>
-        </div>
-
-        <div style="display:flex;align-items:center;gap:12px">
-          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-            <input type="checkbox" name="consent" required style="margin-top:2px;width:14px;height:14px;accent-color:#22D3EE;flex-shrink:0" />
-            <span style="font-size:12px;color:#4B6580;line-height:1.5"><span class="en">I agree to be contacted by Flowscale Agency regarding my automation project.</span><span class="fr">J'accepte d'être contacté par Flowscale Agency concernant mon projet d'automatisation.</span></span>
-          </label>
-        </div>
-
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px" id="submit-btn">
-          <span id="submit-text-en" class="en"><span class="en">Send Message</span></span>
-          <span id="submit-text-fr" class="fr">Envoyer le Message</span>
-          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M14 8H2M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </form>
-
-      <!-- Success message -->
-      <div id="success-msg" style="display:none;text-align:center;padding:32px 0">
-        <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="en" style="font-size:17px;font-weight:600;color:#F1F5F9;margin-bottom:6px">Message sent!</div>
-        <div class="fr" style="font-size:17px;font-weight:600;color:#F1F5F9;margin-bottom:6px">Message envoyé !</div>
-        <p class="en" style="font-size:14px;color:#4B6580">We'll get back to you within 24 hours. Check your inbox.</p>
-        <p class="fr" style="font-size:14px;color:#4B6580">Nous vous répondrons dans les 24 heures. Vérifiez votre boîte mail.</p>
+      <div class="footer-links">
+        <a href="mailto:hello@flowscale.agency">Email</a>
+        <a href="https://upwork.com" target="_blank" rel="noopener">Upwork</a>
+        <a href="#portfolio">Work</a>
       </div>
     </div>
-
-    <!-- Social / contact links -->
-    <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:32px;flex-wrap:wrap">
-      <a href="mailto:hello@flowscale.agency" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#94A3B8'" onmouseout="this.style.color='#4B6580'">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.5"/></svg>
-        hello@flowscale.agency
-      </a>
-      <div style="width:4px;height:4px;border-radius:50%;background:#1C2A38"></div>
-      <a href="https://upwork.com/freelancers/sabig" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#94A3B8'" onmouseout="this.style.color='#4B6580'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.561 13.158c-1.102 0-2.135-.467-3.074-1.227l.228-1.076.008-.042c.207-1.143.849-3.06 2.839-3.06 1.492 0 2.703 1.212 2.703 2.703-.001 1.489-1.212 2.702-2.704 2.702zm0-8.14c-2.539 0-4.51 1.649-5.31 4.366-1.22-1.834-2.148-4.036-2.687-5.892H7.828v7.112c-.002 1.406-1.141 2.546-2.547 2.548-1.405-.002-2.543-1.142-2.545-2.548V3.492H0v7.112c0 2.914 2.37 5.303 5.281 5.303 2.913 0 5.283-2.389 5.283-5.303v-1.19c.529 1.107 1.182 2.229 1.974 3.221l-1.673 7.873h2.797l1.213-5.71c1.063.679 2.285 1.109 3.686 1.109 3 0 5.439-2.452 5.439-5.45 0-3-2.439-5.439-5.439-5.439z"/></svg>
-        Upwork Profile
-      </a>
-      <div style="width:4px;height:4px;border-radius:50%;background:#1C2A38"></div>
-      <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4B6580">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
-        <span class="en">Cotonou, Bénin · Global</span>
-        <span class="fr">Cotonou, Bénin · Mondial</span>
-      </span>
-    </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
-<footer style="padding:40px 24px;border-top:1px solid #1C2A38;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;max-width:1200px;margin:0 auto">
-  <div style="display:flex;align-items:center;gap:10px">
-    <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#0891B2,#22D3EE);display:flex;align-items:center;justify-content:center">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 2 10 2-5 1 0" stroke="#030507" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="8" r="1.5" fill="#030507"/></svg>
-    </div>
-    <span style="font-size:14px;font-weight:600;color:#94A3B8">Flowscale<span style="color:#22D3EE">.</span></span>
-    <span style="font-size:13px;color:#4B6580">© 2025</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <div style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:pulse 2.5s infinite"></div>
-    <span class="en" style="font-size:12px;color:#4B6580">Available for new projects</span>
-    <span class="fr" style="font-size:12px;color:#4B6580">Disponible pour de nouveaux projets</span>
-  </div>
-  <div style="font-family:'DM Mono',monospace;font-size:11px;color:#4B6580">
-    Built with n8n · <span class="en">Powered by AI</span><span class="fr">Propulsé par IA</span>
   </div>
 </footer>
 
 
 <script>
-  /* Language switcher */
-  function setLang(lang) {
-    document.body.classList.remove('lang-en', 'lang-fr');
-    document.body.classList.add('lang-' + lang);
-    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-    document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
-    document.documentElement.lang = lang;
-  }
+/* ── LANGUAGE ─────────────────────────────── */
+function setLang(l){
+  document.body.className='lang-'+l;
+  document.getElementById('btn-en').classList.toggle('on',l==='en');
+  document.getElementById('btn-fr').classList.toggle('on',l==='fr');
+  document.documentElement.lang=l;
+}
 
-  /* Scroll reveal */
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* ── HERO BG PARALLAX ──────────────────────── */
+window.addEventListener('load',()=>{
+  document.getElementById('heroBg').classList.add('loaded');
+});
 
-  /* Navbar scroll effect */
-  window.addEventListener('scroll', () => {
-    const nav = document.getElementById('navbar');
-    if (window.scrollY > 40) {
-      nav.style.borderBottomColor = 'rgba(28,42,56,1)';
-    } else {
-      nav.style.borderBottomColor = 'rgba(28,42,56,.6)';
-    }
-  });
+/* ── MARQUEE ───────────────────────────────── */
+const items=[
+  'n8n Workflow Automation','WhatsApp AI Agent','NocoDB Integration',
+  'Medical Triage System','Real Estate Lead Bot','Google Sheets CRM',
+  'Cloudinary Media Bridge','Email Nurturing Sequences','GPT-4o Agents',
+  'Supabase Memory Layer','Async Communication','USA & Global Clients'
+];
+const mq=document.getElementById('mq');
+const full=[...items,...items];
+full.forEach(t=>{
+  const el=document.createElement('div');
+  el.className='marquee-item';
+  el.innerHTML=`<span class="marquee-dot"></span>${t}`;
+  mq.appendChild(el);
+});
 
-  /* Contact form — sends to n8n webhook */
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const btn = document.getElementById('submit-btn');
-    const langEN = document.body.classList.contains('lang-fr');
+/* ── SCROLL REVEAL ─────────────────────────── */
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
-    btn.disabled = true;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-dasharray="28 28" stroke-linecap="round" style="animation:spin 1s linear infinite;transform-origin:center"><animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/></circle></svg> ' + (langEN ? 'Envoi...' : 'Sending...');
+/* ── NAVBAR SCROLL ─────────────────────────── */
+const nav=document.querySelector('nav');
+window.addEventListener('scroll',()=>{
+  nav.style.borderBottomColor=window.scrollY>40?'rgba(42,41,32,.9)':'rgba(42,41,32,.6)';
+});
 
-    const data = {
-      name: form.name.value,
-      email: form.email.value,
-      company: form.company.value,
-      industry: form.industry.value,
-      message: form.message.value,
-      lang: document.body.classList.contains('lang-fr') ? 'fr' : 'en',
-      source: 'flowscale-website',
-      timestamp: new Date().toISOString()
-    };
+/* ── CONTACT FORM ──────────────────────────── */
+async function handleSubmit(e){
+  e.preventDefault();
+  const f=e.target,btn=document.getElementById('sbtn');
+  btn.disabled=true;
+  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/><path d="M8 2a6 6 0 0 1 6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" values="0 8 8;360 8 8" dur=".8s" repeatCount="indefinite"/></path></svg> Sending…';
 
-    try {
-      /* Replace the URL below with your actual n8n webhook URL */
-      const WEBHOOK_URL = 'https://your-n8n-instance.com/webhook/flowscale-contact';
+  const data={
+    name:f.name.value,email:f.email.value,
+    company:f.company.value,industry:f.industry.value,
+    message:f.message.value,
+    lang:document.body.classList.contains('lang-fr')?'fr':'en',
+    source:'flowscale-website',
+    timestamp:new Date().toISOString()
+  };
 
-      await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        mode: 'no-cors'
-      });
-    } catch (err) {
-      console.log('Webhook delivery attempted:', err);
-    }
+  try{
+    /* ← Replace with your actual n8n webhook URL */
+    await fetch('https://your-n8n-instance.com/webhook/flowscale-contact',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data),mode:'no-cors'
+    });
+  }catch(err){console.log('Webhook attempted',err)}
 
-    /* Always show success — no-cors means we can't read the response */
-    form.style.display = 'none';
-    document.getElementById('success-msg').style.display = 'block';
-  }
+  document.getElementById('cform').style.display='none';
+  document.getElementById('sbox').style.display='block';
+}
 </script>
 </body>
 </html>
